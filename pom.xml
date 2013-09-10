@@ -11,7 +11,7 @@
     <maven>2.0.6</maven>
   </prerequisites>
 
-  <url>https://github.com/CELAR/cloud-cost-eval</url>
+  <url>https://github.com/CELAR/multilevel-metrics-evaluation</url>
 
   <description>
     MELA: implementation of Multi-Level Metrics Evaluation Module
@@ -34,7 +34,7 @@
 
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/CELAR/cloud-cost-eval/issues</url>
+    <url>https://github.com/CELAR/multilevel-metrics-evaluation/issues</url>
   </issueManagement>
 
   <ciManagement>
@@ -43,8 +43,8 @@
   </ciManagement>
 
   <scm>
-    <connection>scm:git:ssh://git@github.com:CELAR/cloud-cost-eval.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:CELAR/cloud-cost-eval.git</developerConnection>
+    <connection>scm:git:ssh://git@github.com:CELAR/multilevel-metrics-evaluation.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:CELAR/multilevel-metrics-evaluation.git</developerConnection>
   </scm>
 
   <repositories>
