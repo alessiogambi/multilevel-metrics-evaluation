@@ -5,7 +5,7 @@
   <artifactId>MELA-Celar-Pom</artifactId>
   <version>0.1-SNAPSHOT</version>
   <name>MELA-Celar</name>
-  <description>The components needed to integrate MELA in CELAR </description>  
+  <description>The components needed to integrate MELA with the other CELAR modules </description>  
    
   <packaging>pom</packaging>
  
