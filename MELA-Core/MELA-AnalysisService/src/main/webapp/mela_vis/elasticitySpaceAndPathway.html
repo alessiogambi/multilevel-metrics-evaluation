@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Elasticity Space</title>
+<style>
+
+    body {
+        font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+        display: none;
+    }
+
+    .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 1.5px;
+    }
+
+</style>
+<body>
+    <script src="http://d3js.org/d3.v3.js"></script>
+    <script>
+
+        var elasticitySpaceURL="http://localhost:8080/MELA-AnalysisService-1.0/REST_WS/elasticityspace";
+        var elasticityPathwayURL="http://localhost:8080/MELA-AnalysisService-1.0/REST_WS/elasticitypathway";
+
+        var margin = {top:20, right:20, bottom:30, left:100},
+        width = 500 - margin.left - margin.right,
+        height = 300 - margin.top - margin.bottom;
+
+      
+
+        function generateElSpaceChart(elSpaceJSON, rootNode, lineThickness, lineColors, xLoc, yLoc, width, height, xAxisLabel) {
+            var currentColumn = 0;
+            var currentRow = 0;
+            
+            for (var dimensionIndex = 0; dimensionIndex < elSpaceJSON.dimensions.length; dimensionIndex++) {
+                if(currentColumn >= maxColumns){
+                    currentColumn = 0;
+                    currentRow = currentRow  + 1;
+                } 
+                xLocation = xLoc + currentColumn * (width+70) + 30 ; 
+                yLocation = yLoc + currentRow * width; 
+                
+                var x = d3.scale.linear()
+                .range([xLocation, xLocation + width]);
+
+                var y = d3.scale.linear()
+                .range([yLocation + height, yLocation]);
+
+                var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+                var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left");
+            
+                dimension = elSpaceJSON.dimensions[dimensionIndex];
+
+                var index = 1;
+                
+                
+                for(var valueIndex = 0; valueIndex < dimension.values.length; valueIndex++){
+                    dimension.values[valueIndex].index=index;
+                    dimension.upperBoundary[valueIndex].index=index;
+                    dimension.lowerBoundary[valueIndex].index=index;
+                    index = index + 1;
+                }
+
+                x.domain(d3.extent(dimension.values, function (d) {
+                    return d.index;
+                }));
+
+                var minY = dimension.lowerBoundary[0].value;
+                
+                
+                var maxValue = Math.max.apply(null, dimension.values.map(function (c) {
+                    return c.value;
+                }));
+                
+                var minValue = Math.min.apply(null, dimension.values.map(function (c) {
+                    return c.value;
+                }));
+                
+                
+                var maxY = dimension.upperBoundary[0].value;
+                
+                if(minY == maxY){
+                    if(minY != 0){
+                        minY = 0;
+                    }else{
+                        maxY = 1;
+                    }
+                }
+                
+                if(maxY < maxValue){
+                    maxY = maxValue;
+                }
+                
+                if(minY > minValue){
+                    minY = minValue;
+                }
+                
+                y.domain([minY, maxY] );
+                
+                var yAxisLabel = dimension.name + " (" + dimension.unit + ")";
+
+                rootNode.append("rect")
+                .attr("x", xLocation )
+                .attr("y", yLocation)
+                .attr("width", width)
+                .attr("height", height).style("fill","none").style("stroke","black");
+                
+
+                var path = rootNode.append("g")
+                .attr("class", "y axis")
+                .attr("x", xLocation )
+                //                .style("font-size", "200%")
+                .attr("transform", "translate(0," + (+yLocation + +height) + ")")
+                //                .transition().duration(1000)
+                .call(xAxis);
+                //
+                //                path.transition()
+                //                .duration(1000)
+                //                .ease("linear");
+
+                rootNode.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate("+xLocation +",0)")
+                //                .style("font-size", "200%")
+                .call(yAxis)
+                
+                
+                rootNode.append("g")
+                .attr("class", "y axis").append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", xLocation-40)
+                .attr("x", -yLocation - +height / 2 - yAxisLabel.length)
+                .attr("dy", ".71em")
+                .style("text-anchor", "start")
+                //                .style("font-size", "150%")
+                .text(yAxisLabel);
+
+                rootNode.append("g")
+                .attr("class", "y axis")
+                .append("text")
+                .attr("y", +yLocation + +height + 25)
+                .attr("x", +xLocation + +width / 2 - xAxisLabel.length*6/2)
+                .attr("dy", ".71em")
+                .style("text-anchor", "start")
+                //                .style("font-size", "250%")
+                .text(xAxisLabel);
+
+              
+                var line = d3.svg.line()
+                .x(function (d) {
+                    return x(d.index);
+                })
+                .y(function (d) {
+                    return y(d.value);
+                });
+
+                rootNode.append("path")
+                .datum(dimension.values)
+                .attr("class", "line")
+                .style("stroke", lineColors[0])
+                .style("stroke-width", lineThickness[0])
+                .attr("d", line);
+                    
+                rootNode.append("path")
+                .datum(dimension.upperBoundary)
+                .attr("class", "line")
+                .style("stroke", lineColors[1])
+                .style("stroke-width", lineThickness[1])
+                .attr("d", line);
+                    
+                rootNode.append("path")
+                .datum(dimension.lowerBoundary)
+                .attr("class", "line")
+                .style("stroke", lineColors[2])
+                .style("stroke-width", lineThickness[2])
+                .attr("d", line);
+
+               
+                
+                
+
+                var legendNames = ["Upper Boundary", "Dimension: " + dimension.name, "Lower Boundary" ];
+                
+                //upper boundary legend entry
+                {
+                    var legend = rootNode                 
+                    .append("g")
+                    .data([legendNames[0]])
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i) { return "translate("  + 100 + "," + (+yLocation -20 )+ ")"; });
+
+                    legend.append("rect")
+                    .attr("x", xLocation - 18)
+                    .attr("y", -5)
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .style("fill", function(d){
+                        if(d.match(/.*Boundary/)){
+                            return "D13F31";
+                        }else{
+                            return "72B095";
+                        }
+                    });
+
+                    legend.append("text")
+                    .attr("x", xLocation - 24)
+                    .attr("dy", ".35em")
+                    //                    .style("font-size", "200%")
+                    .style("text-anchor", "end")
+                    .text(function(d) { return d; });
+                }
+                
+                //metric legend entry
+                {
+                    var legend = rootNode                 
+                    .append("g")
+                    .data([legendNames[1]])
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i) { return "translate("  + (100 + legendNames[0].length *12) + "," + (+yLocation -20 )+ ")"; });
+
+                    legend.append("rect")
+                    .attr("x", xLocation  - 18)
+                    .attr("y", -5)
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .style("fill", function(d){
+                        if(d.match(/.*Boundary/)){
+                            return "D13F31";
+                        }else{
+                            return "72B095";
+                        }
+                    });
+
+                    legend.append("text")
+                    .attr("x", xLocation  - 24)
+                    .attr("dy", ".35em")
+                    //                    .style("font-size", "200%")
+                    .style("text-anchor", "end")
+                    .text(function(d) { return d; });
+                }
+                
+                //upper boundary legend entry
+                {
+                    var legend = rootNode                 
+                    .append("g")
+                    .data([legendNames[2]])
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i) { return "translate("  + 0 + "," + (+yLocation -20 )+ ")"; });
+
+                    legend.append("rect")
+                    .attr("x", xLocation +  width - 18)
+                    .attr("y", -5)
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .style("fill", function(d){
+                        if(d.match(/.*Boundary/)){
+                            return "D13F31";
+                        }else{
+                            return "72B095";
+                        }
+                    });
+
+                    legend.append("text")
+                    .attr("x", xLocation + width - 24)
+                    .attr("dy", ".35em")
+                    //                    .style("font-size", "200%")
+                    .style("text-anchor", "end")
+                    .text(function(d) { return d; });
+                }
+                
+                yLocation = yLocation+ height + 100;
+                currentColumn = currentColumn + 1;
+            }
+
+        }
+
+        function generateElPathwayChart(signature, rootNode, colors, xLocation,yLocation, width, height, xAxisLabel, yAxisLabel) {
+ 
+            var x0 = d3.scale.ordinal()
+            .rangeRoundBands([xLocation, xLocation +  width], .1);
+
+            var x1 = d3.scale.ordinal();
+
+            var y = d3.scale.linear()
+            .range([yLocation + height, yLocation]);
+
+            var color = d3.scale.ordinal()
+            .range(colors);
+
+            var xAxis = d3.svg.axis()
+            .scale(x0)
+            .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .tickFormat(d3.format(".2s"));
+
+            var data = signature.neurons;
+             
+            var ageNames = signature.metricLabels.map(function(d){
+                return d.name;
+            });
+            
+            data.forEach(function(d) {
+                d.ages = ageNames.map(function(name) {
+                    return {name: name, value: +d[name]}; });
+            });
+            
+            x0.domain(data.map(function(d) { return d.encounterRate; }));
+            x1.domain(ageNames).rangeRoundBands([0, x0.rangeBand()]);
+            y.domain([-0.1, d3.max(data, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
+            
+            rootNode.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(0," + (yLocation +  height) + ")")
+            //            .style("font-size", "200%")
+            .call(xAxis);
+            
+            rootNode.append("g")
+            .attr("class", "y axis")
+            //            .style("font-size", "200%")
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", + (+xLocation-45))
+            .attr("x", +  (-yLocation - height/2 - yAxisLabel.length*12/2))
+            .attr("dy", ".71em")
+            .style("text-anchor", "start")
+            .style("font-size", "150%")
+            .text(yAxisLabel);
+            
+            
+            rootNode.append("g")
+            .attr("class", "y axis")
+            .append("text")
+            .attr("y",+yLocation+ height  + 20)
+            .attr("x", +xLocation + width/2 - xAxisLabel.length*6/2)
+            .attr("dy", ".71em")
+            .style("text-anchor", "start")
+            .style("font-size", "150%")
+            .text(xAxisLabel);
+            
+            
+            var state = rootNode.selectAll(".encounterRate")
+            .data(data)
+            .enter().append("g")
+            .attr("class", "g")
+            .attr("transform", function(d) { return "translate(" + x0(d.encounterRate) + ",0)"; });
+            
+            state.selectAll("rect")
+            .data(function(d) { return d.ages; })
+            .enter().append("rect")
+            .attr("width", x1.rangeBand())
+            .attr("x", function(d) {
+                return x1(d.name); })
+            .attr("y", function(d) {
+                return y(d.value); })
+            .attr("height", function(d) {
+                return (+yLocation + +height) - y(d.value); })
+            .style("fill", function(d,i) { 
+                return color(i); });
+            
+            var legend = rootNode.selectAll(".legend")
+            .data(ageNames.slice())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) { return "translate("+(50 +i*width/ageNames.length)+"," + (+yLocation - 40) + ")"; });
+            
+            legend.append("rect")
+            .attr("x", xLocation  - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", function(d,i) {
+                return color(i); });
+            
+            legend.append("text")
+            .attr("x", xLocation +5 )
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("font-size", "125%")
+            .style("text-anchor", "start")
+            .text(function(d) { return d; });
+            
+          
+        }
+    
+        var elSpaceColors = ["72B095", "D13F31", "D13F31" ];
+        var elPathwayColors = ["#1C4946", "#1F7872", "#72B095", "#DEDBA7", "#D13F31", "#8C9C9A", "#9DB2B1"];
+        //       
+        var lineThickness = new Array("3px", "3px", "3px");
+
+
+        // generateElSpaceChart("space_ws.tsv", svg, lineThickness, new Array("clients", "BOUNDARY_U_clients", "BOUNDARY_L_clients"), colors, 0, 0, width, height, "Time (x5s)", "Clients/h (count)");
+        //    generateElSpaceChart("space_ws.tsv", svg, lineThickness, new Array("responseTime", "BOUNDARY_U_responseTime", "BOUNDARY_L_responseTime"), colors, 0, height + 100, width, height, "Time (x5s)", "ResponseTime (ms)");
+
+        //assumes there is the serivce ID and Type after ? in the URL. example
+        //http://localhost:8080/MELA/mela_vis/lineChart.html?WebServiceTopology&SERVICE_TOPOLOGY
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        
+        var elSpaceDiv = d3.select("body").append("div");
+        var elPthwDiv = d3.select("body").append("div");
+        var maxColumns;
+        
+        document.title = vars[0]+ ": Elasticity Analysis";
+        
+        setInterval(function () {
+            
+            drawElSpaceAndPathway(vars);
+        
+        }, 3000);
+            
+        function drawElSpaceAndPathway(vars){   
+            
+            //http request, can do POST to get the Elasticity Space   
+            d3.xhr(elasticitySpaceURL,"application/xml").post("<MonitoredElement id=\"" + vars[0] + "\" level=\"" + vars[1] + "\"/>",function(error,dimension){
+                
+                elSpaceDiv.selectAll("h2").remove();
+                elSpaceDiv.selectAll("svg").remove();
+                
+                elSpaceDiv.append("h2").text("Elasticity Space  for " + vars[0]);
+                
+                elSpace = JSON.parse(dimension.response);
+                
+                maxColumns = Math.floor(window.innerWidth/(width + 30));
+            
+                elSpaceSVGHeight = Math.ceil(elSpace.dimensions.length / maxColumns) * (height + margin.left + margin.right);
+             
+                elSpaceSVG = elSpaceDiv.append("svg")           
+                .attr("width",  window.innerWidth)
+                .attr("height", elSpaceSVGHeight)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                 
+                elSpaceSVG.append("line")
+                .attr("x1", -margin.left)
+                .attr("y1", 0)
+                .attr("x2", window.innerWidth)
+                .attr("y2", 0)
+                .attr("stroke-width", 1)
+                .attr("stroke", "black");
+                
+               
+                
+            
+             
+                generateElSpaceChart(elSpace, elSpaceSVG, lineThickness, elSpaceColors, -50, 50, width, height, "Time (s)");
+           
+           
+
+            });
+        
+            //get elasticity pathway
+            d3.xhr(elasticityPathwayURL,"application/xml").post("<MonitoredElement id=\"" + vars[0] + "\" level=\"" + vars[1] + "\"/>",function(error,dimension){
+               
+                elPthwDiv.selectAll("h2").remove();
+                elPthwDiv.selectAll("svg").remove();
+                
+                elPthwDiv.append("h2").text("Elasticity Pathway  for " + vars[0]);
+                
+                elPthwSVG = elPthwDiv.append("svg")           
+                .attr("width",  window.innerWidth)
+                .attr("height", window.innerHeight)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+              
+                elPthwSVG.append("line")
+                .attr("x1", -margin.left)
+                .attr("y1", 0)
+                .attr("x2", window.innerWidth)
+                .attr("y2", 0)
+                .attr("stroke-width", 1)
+                .attr("stroke", "black");
+                
+                elPthw = JSON.parse(dimension.response);
+                var elSgnChartWidth =  window.innerWidth - 200;
+                
+                if( (elSgnChartWidth / elPthw.neurons.length) > 200 && elPthw.neurons.length>0  ){
+                    elSgnChartWidth = elPthw.neurons.length * 200;  
+                }
+                
+                if( (elSgnChartWidth / elPthw.metricLabels.length) < 200 && elPthw.metricLabels.length>0  ){
+                    elSgnChartWidth = elPthw.metricLabels.length * 200;  
+                }
+                
+                generateElPathwayChart(elPthw, elPthwSVG, elPathwayColors, 0,70 , elSgnChartWidth, height,"Situations Encounter Rate (%)", "Value");
+                
+            });
+        }
+        
+        drawElSpaceAndPathway(vars);
+
+    </script>

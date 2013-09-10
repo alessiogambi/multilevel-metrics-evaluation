@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>MELA-R-SYBL-Client</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>MELA-R-SYBL-Client</name>
+    <description>R-SYBL-Client for MELA</description>
+ 
+    <parent>
+        <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
+        <artifactId>MELA-Celar-Pom</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+  
+    <packaging>jar</packaging>
+
+    
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    
+        <dependency>
+            <groupId>eu.celar.decision-making</groupId>
+            <artifactId>cloud-application-dependency-graph</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>eu.celar.multilevel-metrics-evaluation</groupId>
+            <artifactId>MELA-Common</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+    
+    </dependencies>
+</project>
