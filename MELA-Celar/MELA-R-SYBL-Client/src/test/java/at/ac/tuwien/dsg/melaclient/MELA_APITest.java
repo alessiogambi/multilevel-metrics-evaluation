@@ -17,11 +17,13 @@
  */
 package at.ac.tuwien.dsg.melaclient;
 
-import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRulesConfiguration;
 import java.io.StringReader;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
+
 import junit.framework.TestCase;
+import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRulesConfiguration;
 
 /**
  * Author: Daniel Moldovan 
@@ -66,17 +68,17 @@ public class MELA_APITest extends TestCase {
                 + "</MetricsCompositionRules>"
                 + "</CompositionRulesConfiguration>";
 
-        Unmarshaller unmarshaller = JAXBContext.newInstance(CompositionRulesConfiguration.class).createUnmarshaller();
-        CompositionRulesConfiguration compositionRulesConfiguration = (CompositionRulesConfiguration) unmarshaller.unmarshal(new StringReader(compositionRules));
-
-        
-        //TODO: express in new way cloud service config
-
-//        new MELA_API().submitServiceConfiguration(null);
-
-
-        new MELA_API().submitMetricCompositionConfiguration(compositionRulesConfiguration);
-        new MELA_API().refreshMonitoringData();
-//        new MELA_API().notifyControlActionStarted(compositionRules, );
+//        Unmarshaller unmarshaller = JAXBContext.newInstance(CompositionRulesConfiguration.class).createUnmarshaller();
+//        CompositionRulesConfiguration compositionRulesConfiguration = (CompositionRulesConfiguration) unmarshaller.unmarshal(new StringReader(compositionRules));
+//
+//        
+//        //TODO: express in new way cloud service config
+//
+////        new MELA_API().submitServiceConfiguration(null);
+//
+//
+//        new MELA_API().submitMetricCompositionConfiguration(compositionRulesConfiguration);
+//        new MELA_API().refreshMonitoringData();
+////        new MELA_API().notifyControlActionStarted(compositionRules, );
     }
 }

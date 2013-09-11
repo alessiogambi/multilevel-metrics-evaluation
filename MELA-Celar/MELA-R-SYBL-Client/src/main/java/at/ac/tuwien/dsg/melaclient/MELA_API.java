@@ -18,19 +18,10 @@
 
 package at.ac.tuwien.dsg.melaclient;
 
-import at.ac.tuwien.dsg.cloudServiceDependencyGraph.Node;
-import at.ac.tuwien.dsg.cloudServiceDependencyGraph.Node.NodeType;
-import at.ac.tuwien.dsg.cloudServiceDependencyGraph.Relationship.RelationshipType;
-import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRulesConfiguration;
-import at.ac.tuwien.dsg.mela.common.monitoringConcepts.Metric;
-import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MetricValue;
-import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
-import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -40,17 +31,24 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
-/**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
+import at.ac.tuwien.dsg.csdg.Node;
+import at.ac.tuwien.dsg.csdg.Node.NodeType;
+import at.ac.tuwien.dsg.csdg.Relationship.RelationshipType;
+import at.ac.tuwien.dsg.csdg.elasticityInformation.ElasticityRequirement;
+import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRulesConfiguration;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.Metric;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MetricValue;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 
- **/
 public class MELA_API {
-
-    private static final String REST_API_URL = "http://localhost:8080/MELA/REST_WS";
+    private boolean existsStructureData = false;
+    private boolean serviceSet = false;
+    private static final String REST_API_URL = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS";
     private static final int MONITORING_DATA_REFRESH_INTERVAL = 5; //in seconds
     private MonitoredElementMonitoringSnapshot latestMonitoringData;
     private AtomicBoolean monitoringDataUsed;
@@ -59,13 +57,16 @@ public class MELA_API {
         latestMonitoringData = new MonitoredElementMonitoringSnapshot();
         monitoringDataUsed = new AtomicBoolean(false);
     }
-
+    public MELA_API(){
+    	
+    }
 //todo: Continuous refresh data with a semaphore like mechanism to synchronzie resource access
     {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                refreshMonitoringData();
+            	if (serviceSet)
+                   refreshMonitoringData();
             }
         };
 
@@ -258,7 +259,8 @@ public class MELA_API {
                 connection.disconnect();
             }
         }
-
+        serviceSet = true;
+     
     }
 
     public void submitMetricCompositionConfiguration(CompositionRulesConfiguration compositionRulesConfiguration) {
@@ -562,15 +564,17 @@ public class MELA_API {
 
         //works as side effect
         public static void convertServiceTopology(MonitoredElement serviceElement, Node cloudService) {
-            
-            Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, "TODO: write such that we also represent the Virtual Machine and Virtual Cluster elements");
-            
             //RuntimeLogger.logger.info("Related nodes for node "+ cloudService +" are "+ cloudService.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP));
-            Node serviceTopology = cloudService.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP).get(0);
-            MonitoredElement serviceTopologyElement = new MonitoredElement();
+            List<Node> serviceTopologies = new ArrayList<Node>();
+            		
+            		serviceTopologies.addAll(cloudService.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP));
+            while (!serviceTopologies.isEmpty()){
+                MonitoredElement serviceTopologyElement = new MonitoredElement();
+
+            Node serviceTopology = serviceTopologies.get(0);
             serviceTopologyElement.setId(serviceTopology.getId());
             serviceTopologyElement.setLevel(MonitoredElement.MonitoredElementLevel.SERVICE_TOPOLOGY);
-            
+
             if (serviceTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP) != null) {
 
                 for (Node serviceUnit : serviceTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP)) {
@@ -578,7 +582,28 @@ public class MELA_API {
                         MonitoredElement serviceUnitElement = new MonitoredElement();
                         serviceUnitElement.setId(serviceUnit.getId());
                         serviceUnitElement.setLevel(MonitoredElement.MonitoredElementLevel.SERVICE_UNIT);
+                        for (Node vm: serviceUnit.getAllRelatedNodesOfType(RelationshipType.HOSTED_ON_RELATIONSHIP,NodeType.VIRTUAL_MACHINE)){
+                        	 MonitoredElement virtualMachine = new MonitoredElement();
+                        	 virtualMachine.setId(vm.getId());
+                        	 virtualMachine.setLevel(MonitoredElement.MonitoredElementLevel.VM);
+                        	 serviceUnitElement.addElement(virtualMachine);
+                        }
+                        for (Node vm: serviceUnit.getAllRelatedNodesOfType(RelationshipType.ASSOCIATED_AT_RUNTIME_RELATIONSHIP,NodeType.VIRTUAL_MACHINE)){
+                        	MonitoredElement virtualMachine = new MonitoredElement();
+	                       	 virtualMachine.setId(vm.getId());
+	                       	 boolean alreadyContained=false;
+	                       	 virtualMachine.setLevel(MonitoredElement.MonitoredElementLevel.VM);
+	                       	 for (MonitoredElement el:serviceUnitElement.getContainedElements())
+	                       	 { 
+	                       		 if (el.getId().equalsIgnoreCase(vm.getId())){
+	                       			alreadyContained=true;
+	                       		 }
+	                       	 }
+	                       	 if (!alreadyContained)
+	                       		 serviceUnitElement.addElement(virtualMachine);
+                        }
                         serviceTopologyElement.addElement(serviceUnitElement);
+
                     }
                 }
             }
@@ -588,11 +613,13 @@ public class MELA_API {
             if (serviceTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP) != null) {
                 for (Node subTopology : serviceTopology.getAllRelatedNodesOfType(RelationshipType.COMPOSITION_RELATIONSHIP)) {
                     if (subTopology.getNodeType() == NodeType.SERVICE_TOPOLOGY) {
-                        convertServiceTopology(serviceTopologyElement, subTopology);
+                    	serviceTopologies.add(subTopology);
                     }
                 }
             }
-
+            serviceTopologies.remove(0);
+            }
+            
         }
 
         public static MonitoredElement.MonitoredElementLevel getElementLevelFromEntity(Node entity) {
@@ -602,10 +629,6 @@ public class MELA_API {
                 return MonitoredElement.MonitoredElementLevel.SERVICE_TOPOLOGY;
             } else if (entity.getNodeType() == NodeType.SERVICE_UNIT) {
                 return MonitoredElement.MonitoredElementLevel.SERVICE_UNIT;
-            } else if (entity.getNodeType() == NodeType.VIRTUAL_MACHINE) {
-                return MonitoredElement.MonitoredElementLevel.VM;
-            } else if (entity.getNodeType() == NodeType.VIRTUAL_CLUSTER) {
-                return MonitoredElement.MonitoredElementLevel.VIRTUAL_CLUSTER;
             } else {
                 Logger.getLogger(MELA_API.class.getName()).log(Level.SEVERE, "Error. Cannot determine the source class of entity " + entity);
                 return null;
@@ -618,4 +641,136 @@ public class MELA_API {
        
 
     }
+    
+    public void submitElasticityRequirements(
+            ArrayList<ElasticityRequirement> description) {
+        //Requirements requirements = new Requirements();
+      //  requirements.setRequirements(new ArrayList<Requirement>());
+
+
+    }
+
+    
+    public float getNumberInstances(Node entity) {
+        Metric metric = new Metric("vmCount");
+        return getMetricValue(metric, entity);
+    }
+    public float getCpuUsage(Node entity) {
+        Metric metric = new Metric("cpu_usage");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getMemoryAvailable(Node entity) {
+        Metric metric = new Metric("mem_free_in_GB");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getMemorySize(Node entity) {
+        Metric metric = new Metric("mem_total_in_GB");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getMemoryUsage(Node entity) {
+        Metric metric = new Metric("mem_used");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getDiskSize(Node entity) {
+        Metric metric = new Metric("disk_total");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getDiskAvailable(Node entity) {
+        Metric metric = new Metric("disk_free");
+        return getMetricValue(metric, entity);
+    }
+
+    //TODO: define agg rule in procentaj
+    public float getDiskUsage(Node entity) {
+
+        return (getDiskSize(entity) - getDiskAvailable(entity)) / getDiskSize(entity) * 100;
+    }
+
+    public float getCPUSpeed(Node entity) {
+
+        Metric metric = new Metric("cpu_speed");
+        return getMetricValue(metric, entity);
+    }
+
+    //TODO: define agg rule in TOTAL
+    public float getPkts(Node entity) {
+        Metric metric = new Metric("pkts_total");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getPktsIn(Node entity) {
+        Metric metric = new Metric("pkts_in");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getPktsOut(Node entity) {
+        Metric metric = new Metric("pkts_out");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getReadLatency(Node entity) {
+        Metric metric = new Metric("read_latency");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getWriteLatency(Node entity) {
+        Metric metric = new Metric("write_latency");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getReadCount(Node entity) {
+        Metric metric = new Metric("read_count");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getCostPerHour(Node entity) {
+        Metric metric = new Metric("costPerHour");
+        return getMetricValue(metric, entity);
+    }
+
+    public float getWriteCount(Node entity) {
+        Metric metric = new Metric("write_count");
+        return getMetricValue(metric, entity);
+    }
+
+    //TODO: can;t be done currentlu
+    public float getTotalCostSoFar(Node entity) {
+        Metric metric = new Metric("costPerHour");
+        return getMetricValue(metric, entity);
+    }
+
+    /**
+     * @return currently, all metrics for the first VM that is monitored. While MELA can return metrics for different VMs belonging to different service units,
+     *         it would require a Service_unit_id to be added as parameter to this call
+     */
+    public List<String> getAvailableMetrics() {
+//        ServiceMonitoringSnapshot monitoringSnapshot = systemControl.getRawMonitoringData();
+//        Map<ServiceElement, ServiceElementMonitoringSnapshot> monitoringData = monitoringSnapshot.getMonitoredData(ServiceElement.ServiceElementLevel.VM);
+//
+//        Collection<Metric> metrics = monitoringData.values().iterator().next().getMonitoredData().keySet();
+        List<String> strings = new ArrayList<String>();
+//        for (Metric metric : metrics) {
+//            strings.add(metric.getName());
+//        }
+        return strings;
+    }
+
+  
+  
+    public float getMetricValue(String metricName, Node entity) {
+        Metric metric = new Metric(metricName);
+        
+        return getMetricValue(metric, entity);
+    }
+
+
+
+   
+
+	
 }
