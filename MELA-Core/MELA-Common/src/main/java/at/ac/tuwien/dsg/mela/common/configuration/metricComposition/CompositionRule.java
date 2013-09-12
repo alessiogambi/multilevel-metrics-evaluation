@@ -139,6 +139,11 @@ public class CompositionRule {
         //1'step extract the monitoring data for the target service elements
         Map<MonitoredElement, MonitoredElementMonitoringSnapshot> levelMonitoringData = serviceMonitoringSnapshot.getMonitoredData(targetMonitoredElementLevel);
 
+        if(levelMonitoringData == null){
+            Logger.getRootLogger().log(Level.WARN, "Level " + targetMonitoredElementLevel + " not found in monitoring data");
+            return;
+        }
+        
         Collection<MonitoredElementMonitoringSnapshot> toBeProcessed = new ArrayList<MonitoredElementMonitoringSnapshot>();
 
         //step 2

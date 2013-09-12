@@ -246,16 +246,16 @@ public class MELA_WS {
 
     }
 
-    @PUT
-    @Path("/executingaction")
+    @POST
+    @Path("/addexecutingactions")
     public void addExecutingAction(List<Action> executingActions) {
         for (Action action : executingActions) {
             systemControl.addExecutingAction(action.getTargetEntityID(), action.getAction());
         }
     }
 
-    @DELETE
-    @Path("/executingaction")
+    @POST
+    @Path("/removeexecutingactions")
     public void removeExecutingAction(List<Action> executingActions) {
         for (Action action : executingActions) {
             systemControl.removeExecutingAction(action.getTargetEntityID(), action.getAction());
