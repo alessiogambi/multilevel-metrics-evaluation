@@ -135,8 +135,7 @@ public class MELA_WS {
             Configuration.getLogger().log(Level.WARN, "supplied service description is null");
         }
     }
-    
-    
+        
      /**
      *
      * @param element refreshes the VM's attached to each Service Unit.
