@@ -16,7 +16,7 @@
  * the License.
  */
 
-package at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities;
+package at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -81,13 +81,13 @@ public class MetricInfo {
      * @return Float, Integer or String representations of the value stored as String by Ganglia
      */
     public Object getConvertedValue() {
-        if (type.contains("float") || type.contains("double")) {
+        if (type.toLowerCase().contains("float") || type.toLowerCase().contains("double")) {
             try{
                 return Float.parseFloat(value);
             }catch(NumberFormatException e){
                return new Float(Float.NaN);
             }
-        } else if (type.contains("int")) {
+        } else if (type.toLowerCase().contains("int")) {
             try{
                 return Integer.parseInt(value);
             }catch(NumberFormatException e){

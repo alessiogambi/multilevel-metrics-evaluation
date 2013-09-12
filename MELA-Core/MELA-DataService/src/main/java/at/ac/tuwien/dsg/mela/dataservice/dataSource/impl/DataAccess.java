@@ -25,13 +25,14 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.ServiceMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.common.requirements.MetricFilter;
-import at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities.ClusterInfo;
-import at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities.HostInfo;
-import at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities.MetricInfo;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.ClusterInfo;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.HostInfo;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.MetricInfo;
 import at.ac.tuwien.dsg.mela.dataservice.dataSource.AbstractDataAccess;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.DataSourceI;
-import at.ac.tuwien.dsg.mela.dataservice.exceptions.DataAccessException;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.dataAccess.DataSourceI;
+import at.ac.tuwien.dsg.mela.common.exceptions.DataAccessException;
 import at.ac.tuwien.dsg.mela.dataservice.utils.Configuration;
+import at.ac.tuwien.dsg.mela.jCatascopiaClient.JCatascopiaDataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,14 +61,16 @@ public class DataAccess extends AbstractDataAccess {
         String accessType = Configuration.getMonitoringDataAccessMethod();
         
         if (accessType.equalsIgnoreCase("LocalGanglia")) {
+            Configuration.getLogger().log(Level.INFO, "Using Local Ganglia data source");
             DataSourceI dataSource = new LocalGangliaLiveDataSource();
             return new DataAccess(dataSource);
         } else if (accessType.equalsIgnoreCase("RemoteGanglia")) {
+            Configuration.getLogger().log(Level.INFO, "Using Remote Ganglia data source");
             DataSourceI dataSource = new RemoteGangliaLiveDataSource();
             return new DataAccess(dataSource);
         } else if (accessType.equalsIgnoreCase("JCatascopia")) {
-            Configuration.getLogger().log(Priority.ERROR, "JCatascopia adapter not yet implemented. Using dummy.");
-            return new DataAccess(new DummyDataSource());
+            Configuration.getLogger().log(Level.INFO, "Using JCatascopia data source");
+            return new DataAccess(new JCatascopiaDataSource());
         } else if (accessType.equalsIgnoreCase("Replay")) {
             String monitoringSeqID = Configuration.getStoredMonitoringSequenceID();
             DataSourceI dataSourceI = new GangliaSQLDataSource(monitoringSeqID, "mela", "mela");

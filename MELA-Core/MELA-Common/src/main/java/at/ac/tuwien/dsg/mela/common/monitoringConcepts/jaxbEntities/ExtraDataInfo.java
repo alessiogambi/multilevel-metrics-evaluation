@@ -16,10 +16,10 @@
  * the License.
  */
 
-package at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities;
-
+package at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities;
 
 import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -28,41 +28,34 @@ import java.util.Collection;
  * E-Mail: d.moldovan@dsg.tuwien.ac.at 
 
  **/
+
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "GANGLIA_XML")
-public class MonitoringSystemInfo {
+@XmlRootElement(name = "EXTRA_DATA")
+public class ExtraDataInfo {
 
-    @XmlElement(name = "CLUSTER")
-    private Collection<ClusterInfo> clusters;
+    @XmlElement(name = "EXTRA_ELEMENT")
+    private Collection<ExtraElementInfo> gangliaExtraElementInfo;
 
-    @XmlAttribute(name = "VERSION")
-    private String version;
-
-    @XmlAttribute(name = "SOURCE")
-    private String source;
-
-
-    public Collection<ClusterInfo> getClusters() {
-        return clusters;
+    {
+        gangliaExtraElementInfo = new ArrayList<ExtraElementInfo>();
     }
 
-    public void setClusters(Collection<ClusterInfo> clusters) {
-        this.clusters = clusters;
+    public Collection<ExtraElementInfo> getGangliaExtraElementInfo() {
+        return gangliaExtraElementInfo;
     }
 
-    public String getVersion() {
-        return version;
+    public void setGangliaExtraElementInfo(Collection<ExtraElementInfo> gangliaExtraElementInfo) {
+        this.gangliaExtraElementInfo = gangliaExtraElementInfo;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
+    @Override
+    public String toString() {
+        String info = "ExtraDataInfo{" +
+                "ExtraElementInfo=";
+        for (ExtraElementInfo elementInfo : gangliaExtraElementInfo) {
+            info += "\t " + elementInfo + "\n";
+        }
+        info += '}';
+        return info;
     }
 }

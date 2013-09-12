@@ -16,7 +16,7 @@
  * the License.
  */
 
-package at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities;
+package at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

@@ -16,8 +16,10 @@
  * the License.
  */
 
- 
-package at.ac.tuwien.dsg.mela.dataservice.exceptions;
+package at.ac.tuwien.dsg.mela.common.monitoringConcepts.dataAccess;
+
+import at.ac.tuwien.dsg.mela.common.exceptions.DataAccessException;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.ClusterInfo;
 
 
 /**
@@ -25,25 +27,6 @@ package at.ac.tuwien.dsg.mela.dataservice.exceptions;
  * E-Mail: d.moldovan@dsg.tuwien.ac.at 
 
  **/
-public class DataAccessException extends Exception {
-
-    public DataAccessException() {
-    }
-
-    public DataAccessException(String message) {
-        super(message);
-    }
-
-    public DataAccessException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public DataAccessException(Throwable cause) {
-        super(cause);
-    }
-
-    public DataAccessException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-    
+public interface DataSourceI {
+    public ClusterInfo getMonitoringData() throws DataAccessException;
 }
