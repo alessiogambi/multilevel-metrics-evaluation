@@ -1,11 +1,13 @@
 /**
- * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group E184
+ * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group
+ * E184
  *
- * This work was partially supported by the European Commission in terms of the CELAR FP7 project (FP7-ICT-2011-8 \#317790)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at
+ * This work was partially supported by the European Commission in terms of the
+ * CELAR FP7 project (FP7-ICT-2011-8 \#317790)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -31,26 +33,24 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Level;
- 
-
 
 /**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at  *
+ *
+ */
+public class InMemoryEncounterRateElasticityPathway {
 
- **/
-public class EncounterRateElasticityPathway {
     int cellsSize = 10;
     int upperNormalizationValue = 100;
 
-    public List<EncounterRateElasticityPathway.SignatureEntry> getElasticitySignature(Map<Metric, List<MetricValue>> dataToClassify) {
+    public List<InMemoryEncounterRateElasticityPathway.SignatureEntry> getElasticitySignature(Map<Metric, List<MetricValue>> dataToClassify) {
         SOM2 som = new SOM2(cellsSize, dataToClassify.keySet().size(), 0, upperNormalizationValue, new SimpleSOMStrategy());
 
         List<SignatureEntry> mapped = new ArrayList<SignatureEntry>();
         //classify all monitoring data
         //need to go trough all monitoring data, and push the classified items, such that I respect the monitored sequence.
-        if (dataToClassify.values().size() == 0) {
-            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity signature");
+        if (dataToClassify.values().isEmpty()) {
+            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity pathway");
             return null;
         }
         int maxIndex = dataToClassify.values().iterator().next().size();
@@ -71,7 +71,7 @@ public class EncounterRateElasticityPathway {
             mapped.add(signatureEntry);
         }
 
-        //train map  completely signature entries
+        //train map  completely pathway entries
         for (SignatureEntry signatureEntry : mapped) {
 
             //build the mappedNeuron used to classify the situation
@@ -83,7 +83,7 @@ public class EncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Signature can;t be applied on non-numeric metric value " + value);
+                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.updateMap(new Neuron(values));
@@ -106,7 +106,7 @@ public class EncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Signature can;t be applied on non-numeric metric value " + value);
+                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can;t be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.classifySituation(new Neuron(values));
@@ -118,14 +118,14 @@ public class EncounterRateElasticityPathway {
         //we might need two things to do: 1 to say in 1 chart this metric point is usual, this not
         //the second to say ok in usual case the metric value combinations are ..
         //currently we go with the second, for which we did not need storing the order of the monitoring data in the entries, but it might be useful later
-//        Map<NeuronUsageLevel, List<SignatureEntry>> signature = new LinkedHashMap<NeuronUsageLevel, List<SignatureEntry>>();
+//        Map<NeuronUsageLevel, List<SignatureEntry>> pathway = new LinkedHashMap<NeuronUsageLevel, List<SignatureEntry>>();
 //        List<SignatureEntry> rare = new ArrayList<SignatureEntry>();
 //        List<SignatureEntry> neutral = new ArrayList<SignatureEntry>();
 //        List<SignatureEntry> dominant = new ArrayList<SignatureEntry>();
 //
-//        signature.put(NeuronUsageLevel.DOMINANT, rare);
-//        signature.put(NeuronUsageLevel.NEUTRAL, neutral);
-//        signature.put(NeuronUsageLevel.RARE, dominant);
+//        pathway.put(NeuronUsageLevel.DOMINANT, rare);
+//        pathway.put(NeuronUsageLevel.NEUTRAL, neutral);
+//        pathway.put(NeuronUsageLevel.RARE, dominant);
 //
 //        for (SignatureEntry signatureEntry : mapped) {
 //            switch (signatureEntry.getMappedNeuron().getUsageLevel()) {
@@ -146,15 +146,15 @@ public class EncounterRateElasticityPathway {
 
     }
 
-
     public List<Neuron> getSituationGroups(Map<Metric, List<MetricValue>> dataToClassify) {
+
         SOM2 som = new SOM2(cellsSize, dataToClassify.keySet().size(), 0, upperNormalizationValue, new SimpleSOMStrategy());
 
         List<SignatureEntry> mapped = new ArrayList<SignatureEntry>();
         //classify all monitoring data
         //need to go trough all monitoring data, and push the classified items, such that I respect the monitored sequence.
         if (dataToClassify.values().size() == 0) {
-            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity signature");
+            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity pathway");
             return null;
         }
         int maxIndex = dataToClassify.values().iterator().next().size();
@@ -175,7 +175,7 @@ public class EncounterRateElasticityPathway {
             mapped.add(signatureEntry);
         }
 
-        //train map  completely signature entries
+        //train map  completely pathway entries
         for (SignatureEntry signatureEntry : mapped) {
 
             //build the mappedNeuron used to classify the situation
@@ -187,7 +187,7 @@ public class EncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Signature can;t be applied on non-numeric metric value " + value);
+                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.updateMap(new Neuron(values));
@@ -210,7 +210,7 @@ public class EncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Signature can;t be applied on non-numeric metric value " + value);
+                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can;t be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.classifySituation(new Neuron(values));
@@ -222,14 +222,14 @@ public class EncounterRateElasticityPathway {
         //we might need two things to do: 1 to say in 1 chart this metric point is usual, this not
         //the second to say ok in usual case the metric value combinations are ..
         //currently we go with the second, for which we did not need storing the order of the monitoring data in the entries, but it might be useful later
-//        Map<NeuronUsageLevel, List<SignatureEntry>> signature = new LinkedHashMap<NeuronUsageLevel, List<SignatureEntry>>();
+//        Map<NeuronUsageLevel, List<SignatureEntry>> pathway = new LinkedHashMap<NeuronUsageLevel, List<SignatureEntry>>();
 //        List<SignatureEntry> rare = new ArrayList<SignatureEntry>();
 //        List<SignatureEntry> neutral = new ArrayList<SignatureEntry>();
 //        List<SignatureEntry> dominant = new ArrayList<SignatureEntry>();
 //
-//        signature.put(NeuronUsageLevel.DOMINANT, rare);
-//        signature.put(NeuronUsageLevel.NEUTRAL, neutral);
-//        signature.put(NeuronUsageLevel.RARE, dominant);
+//        pathway.put(NeuronUsageLevel.DOMINANT, rare);
+//        pathway.put(NeuronUsageLevel.NEUTRAL, neutral);
+//        pathway.put(NeuronUsageLevel.RARE, dominant);
 //
 //        for (SignatureEntry signatureEntry : mapped) {
 //            switch (signatureEntry.getMappedNeuron().getUsageLevel()) {
@@ -247,27 +247,26 @@ public class EncounterRateElasticityPathway {
 
         //returning all, such that I can sort them after occurrence and say this pair of values has been encountered 70%
         List<Neuron> neurons = new ArrayList<Neuron>();
-        for(Neuron  neuron : som){
-           if(!neuron.getMappedWeights().isEmpty()){
-               neurons.add(neuron);
-           }
+        for (Neuron neuron : som) {
+            if (neuron.getMappedWeights() > 0) {
+                neurons.add(neuron);
+            }
         }
-        
-        //sort the list by occurence
-        Collections.sort(neurons, new Comparator<Neuron>(){
 
+        //sort the list by occurence
+        Collections.sort(neurons, new Comparator<Neuron>() {
             public int compare(Neuron o1, Neuron o2) {
                 return o1.getUsagePercentage().compareTo(o2.getUsagePercentage());
             }
-            
         });
-        
-        
+
+
         return neurons;
 
     }
 
     public class SignatureEntry {
+
         private Neuron mappedNeuron;
         private Map<Metric, MetricValue> classifiedSituation;
 

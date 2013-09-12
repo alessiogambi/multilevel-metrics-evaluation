@@ -21,6 +21,7 @@ import at.ac.tuwien.dsg.mela.analysisservice.utils.Configuration;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Level;
 
 
@@ -32,7 +33,9 @@ import org.apache.log4j.Level;
 public class Neuron { //implements Iterable<Neuron> {
     private List<Double> weights;
     //    private List<Neuron> neighbours;
-    private List<List<Double>> mappedWeights;
+//    private List<List<Double>> mappedWeights;
+    private AtomicInteger mappedWeights;
+    
     private NeuronUsageLevel usageLevel;
     private DecimalFormat df = new DecimalFormat("#.###");
 
@@ -43,7 +46,8 @@ public class Neuron { //implements Iterable<Neuron> {
     {
         weights = new ArrayList<Double>();
 //        neighbours = new ArrayList<Neuron>();
-        mappedWeights = new ArrayList<List<Double>>();
+//        mappedWeights = new ArrayList<List<Double>>();
+        mappedWeights = new AtomicInteger(0);
         usageLevel = NeuronUsageLevel.RARE;
     }
 
@@ -89,16 +93,26 @@ public class Neuron { //implements Iterable<Neuron> {
 //    }
 
 
-    public synchronized List<List<Double>> getMappedWeights() {
-        return mappedWeights;
+//    public synchronized List<List<Double>> getMappedWeights() {
+//        return mappedWeights;
+//    }
+    public synchronized int getMappedWeights() {
+        return mappedWeights.get();
     }
 
-    public void setMappedWeights(List<List<Double>> mappedWeights) {
-        this.mappedWeights = mappedWeights;
+//    public void setMappedWeights(List<List<Double>> mappedWeights) {
+//        this.mappedWeights = mappedWeights;
+//    }
+//
+//    public void addMappedWeights(ArrayList<Double> mappedWeights) {
+//        this.mappedWeights.add(mappedWeights);
+//    }
+    public void setMappedWeights(int mappedWeights) {
+        this.mappedWeights.set(mappedWeights);
     }
 
-    public void addMappedWeights(ArrayList<Double> mappedWeights) {
-        this.mappedWeights.add(mappedWeights);
+    public void addMappedWeights(int mappedWeights) {
+        this.mappedWeights.addAndGet(mappedWeights);
     }
 
     /**
@@ -161,8 +175,8 @@ public class Neuron { //implements Iterable<Neuron> {
 //     * @param neuron
 //     */
     public void updateNeuron(Neuron neuron) {
-        mappedWeights.add(neuron.getWeights());
-//        updateNeuron(neuron, strategy, 1);
+//        mappedWeights.addAndGet(neuron.getWeights().size());
+        mappedWeights.addAndGet(1);
     }
 //
 //

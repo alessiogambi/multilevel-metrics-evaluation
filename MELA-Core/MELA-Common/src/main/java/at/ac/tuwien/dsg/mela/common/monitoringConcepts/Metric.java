@@ -17,6 +17,7 @@
  */
 package at.ac.tuwien.dsg.mela.common.monitoringConcepts;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.*;
 
 /**
@@ -26,7 +27,7 @@ import javax.xml.bind.annotation.*;
  **/
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "Metric")
-public class Metric {
+public class Metric implements Serializable{
     @XmlAttribute(name = "name", required = true)
     private String name;
     @XmlAttribute(name = "measurementUnit", required = true)
@@ -122,7 +123,7 @@ public class Metric {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlRootElement(name = "Metric")
     @XmlEnum
-    public enum MetricType {
+    public enum MetricType implements Serializable{
         @XmlEnumValue("RESOURCE")
         RESOURCE,
         @XmlEnumValue("COST")

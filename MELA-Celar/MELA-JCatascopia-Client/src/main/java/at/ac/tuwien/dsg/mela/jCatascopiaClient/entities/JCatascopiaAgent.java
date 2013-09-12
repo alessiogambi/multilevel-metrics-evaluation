@@ -70,4 +70,10 @@ public class JCatascopiaAgent {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public List<JCatascopiaMetric> getAgentMetrics() {
+        return agentMetrics;
+    }
+    
+    
 }

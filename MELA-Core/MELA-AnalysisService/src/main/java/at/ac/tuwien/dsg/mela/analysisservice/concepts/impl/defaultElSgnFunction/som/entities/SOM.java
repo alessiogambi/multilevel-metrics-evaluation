@@ -340,9 +340,9 @@ public class SOM implements Iterable<Neuron> {
 
         ArrayList<Integer> encounteredSituationsPerNeuron = new ArrayList<Integer>();
         for (Neuron neuron : this) {
-            int mappedSituations = neuron.getMappedWeights().size();
+            int mappedSituations = neuron.getMappedWeights();
             if (mappedSituations > 0) {
-                encounteredSituationsPerNeuron.add(neuron.getMappedWeights().size());
+                encounteredSituationsPerNeuron.add(neuron.getMappedWeights());
             }
         }
 
@@ -366,7 +366,7 @@ public class SOM implements Iterable<Neuron> {
         Integer partialDeviation = new Double(stdDeviation * toleranceRange).intValue();
 
         for (Neuron neuron : this) {
-            int mappedSituations = neuron.getMappedWeights().size();
+            int mappedSituations = neuron.getMappedWeights();
             if (mappedSituations > 0) {
                 Integer distanceFromMean = mappedSituations - mean;
                 if (distanceFromMean < 0 && Math.abs(distanceFromMean) >= partialDeviation && Math.abs(distanceFromMean) <= stdDeviation) {
@@ -386,9 +386,9 @@ public class SOM implements Iterable<Neuron> {
 
         ArrayList<Integer> encounteredSituationsPerNeuron = new ArrayList<Integer>();
         for (Neuron neuron : this) {
-            int mappedSituations = neuron.getMappedWeights().size();
+            int mappedSituations = neuron.getMappedWeights();
             if (mappedSituations > 0) {
-                encounteredSituationsPerNeuron.add(neuron.getMappedWeights().size());
+                encounteredSituationsPerNeuron.add(neuron.getMappedWeights());
             }
         }
 
@@ -412,7 +412,7 @@ public class SOM implements Iterable<Neuron> {
 
 
         for (Neuron neuron : this) {
-            int mappedSituations = neuron.getMappedWeights().size();
+            int mappedSituations = neuron.getMappedWeights();
             if (mappedSituations > 0) {
                 Integer distanceFromMean = mappedSituations - mean;
                 if (distanceFromMean < 0 && Math.abs(distanceFromMean) >= stdDeviation) {
@@ -428,9 +428,9 @@ public class SOM implements Iterable<Neuron> {
 
         ArrayList<Integer> encounteredSituationsPerNeuron = new ArrayList<Integer>();
         for (Neuron neuron : this) {
-            int mappedSituations = neuron.getMappedWeights().size();
+            int mappedSituations = neuron.getMappedWeights();
             if (mappedSituations > 0) {
-                encounteredSituationsPerNeuron.add(neuron.getMappedWeights().size());
+                encounteredSituationsPerNeuron.add(neuron.getMappedWeights());
             }
         }
 
@@ -461,7 +461,7 @@ public class SOM implements Iterable<Neuron> {
     //or just to remove values used in training
     public void clearMappings() {
         for (Neuron neuron : this) {
-            neuron.getMappedWeights().clear();
+            neuron.setMappedWeights(0);
         }
     }
 
@@ -474,7 +474,7 @@ public class SOM implements Iterable<Neuron> {
 
         ArrayList<Integer> encounteredSituationsPerNeuron = new ArrayList<Integer>();
         for (Neuron neuron : this) {
-            encounteredSituationsPerNeuron.add(neuron.getMappedWeights().size());
+            encounteredSituationsPerNeuron.add(neuron.getMappedWeights());
         }
 
         //compute mean of the number of mapped situations per neuron
@@ -497,7 +497,7 @@ public class SOM implements Iterable<Neuron> {
 
 
         for (Neuron neuron : this) {
-            Integer distanceFromMean = neuron.getMappedWeights().size() - mean;
+            Integer distanceFromMean = neuron.getMappedWeights() - mean;
             if (distanceFromMean >= stdDeviation) {
                 rareSituations.add(neuron);
             }
@@ -562,7 +562,7 @@ public class SOM implements Iterable<Neuron> {
             }
         }
 
-        //only add to encounters if he map is learning. otherwise it still changes in time.
+        //only add to encounters if the map is learning. otherwise it still changes in time.
 //        neurons[closestI][closestJ].addMappedWeights(newData.getWeights());
         return neurons[closestI][closestJ];
     }
@@ -579,7 +579,7 @@ public class SOM implements Iterable<Neuron> {
         Thread t = new Thread(){
             @Override
             public void run() {
-                int mappedSituations = source.getMappedWeights().size();
+                int mappedSituations = source.getMappedWeights();
 
                 Integer partialDeviation = new Double(standardDeviation * toleranceRange).intValue();
 

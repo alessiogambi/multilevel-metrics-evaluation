@@ -173,17 +173,17 @@ public class SOM2 extends SOM {
         for (int row = 0; row < elementsNo; row++) {
             for (int column = 0; column < elementsNo; column++) {
                 Neuron neuron = neurons[row][column];
-                if(neuron.getMappedWeights().size() == 0){
+                if(neuron.getMappedWeights() == 0){
                     continue;
                 }
-                mappedSituationsNr.add(neuron.getMappedWeights().size());
-                average += neuron.getMappedWeights().size();
+                mappedSituationsNr.add(neuron.getMappedWeights());
+                average += neuron.getMappedWeights();
             }
         }
 
         Integer totalMapped = average;
 
-        average /= mappedSituationsNr.size();
+        average = (mappedSituationsNr.size() > 0)?average/mappedSituationsNr.size():average;
         Double sdtDev = 0d;
         for (Integer sitNr : mappedSituationsNr) {
             sdtDev += Math.abs(sitNr - average);
@@ -210,28 +210,31 @@ public class SOM2 extends SOM {
         //traverse map and merge any elements which have the SAME value
         for (int row = 0; row < elementsNo; row++) {
             for (int column = 0; column < elementsNo; column++) {
-                Neuron neuron =   neurons[row][column];
+                Neuron neuron = neurons[row][column];
                 for (int i = 0; i < elementsNo; i++) {
                     for (int j = 0; j < elementsNo; j++) {
-                        if(i!=row || j != column){
-                            Neuron neuron2 =   neurons[i][j];
-                            if(neuron.equals(neuron2)){
-                                List<List<Double>> l = new ArrayList<List<Double>>();
-                                l.addAll( neuron2.getMappedWeights());
-                                for(List<Double> doubleList : l){
-                                    neuron.updateNeuron(new Neuron(doubleList));
-                                }
-                                neuron2.getMappedWeights().clear();
+                        if (i != row || j != column) {
+                            Neuron neuron2 = neurons[i][j];
+                            if (neuron.equals(neuron2)) {
+//                                List<List<Double>> l = new ArrayList<List<Double>>();
+//                                l.addAll(neuron2.getMappedWeights());
+//                                for(List<Double> doubleList : l){
+//                                    neuron.updateNeuron(neuron2.getMappedWeights());
+//                                }
+                                //just increments with 1 the nr of mappedWeights
+                                neuron.updateNeuron(new Neuron());
+                                neuron2.setMappedWeights(0);
+//                                neuron2.getMappedWeights().clear();
                                 List<Double> newWeights = neuron.getWeights();
-                                for(int k = 0; k < newWeights.size(); k++){
-                                    newWeights.set(k,0d);
+                                for (int k = 0; k < newWeights.size(); k++) {
+                                    newWeights.set(k, 0d);
                                 }
                             }
                         }
                     }
                 }
-
-
+                
+                
             }
         }
 
@@ -243,7 +246,7 @@ public class SOM2 extends SOM {
                     @Override
                     public void run() {
 
-                        int mappedSituations = source.getMappedWeights().size();
+                        int mappedSituations = source.getMappedWeights();
 
                         Integer partialDeviation = new Double(standardDeviation * 0.7).intValue();
 

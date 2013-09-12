@@ -181,4 +181,23 @@ import java.util.*;
                 "\n\telasticitySpaceBoundary=" + elasticitySpaceBoundary +
                 '}';
     }
+    
+     /**
+      * resets to initial state after construction the object
+      */
+     public void reset() {
+
+         spaceEntries = new ArrayList<ElasticitySpaceEntry>();
+         elasticitySpaceBoundary = new ElasticitySpaceBoundary();
+         monitoringData = new LinkedHashMap<MonitoredElement, Map<Metric, List<MetricValue>>>();
+
+         //create the monitoring data structure
+         List<MonitoredElement> queue = new ArrayList<MonitoredElement>();
+         queue.add(this.service);
+         while (!queue.isEmpty()) {
+             MonitoredElement element = queue.remove(0);
+             queue.addAll(element.getContainedElements());
+             monitoringData.put(element, new HashMap<Metric, List<MetricValue>>());
+         }
+     }
 }

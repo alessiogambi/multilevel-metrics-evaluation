@@ -17,6 +17,7 @@
  */
 package at.ac.tuwien.dsg.mela.common.monitoringConcepts;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import java.util.Collection;
@@ -42,7 +43,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="MonitoredElementSnapshot")
-public class MonitoredElementMonitoringSnapshot {
+public class MonitoredElementMonitoringSnapshot implements Serializable{
 
     @XmlElement(name = "MonitoredElement", required = false)
     private MonitoredElement MonitoredElement;

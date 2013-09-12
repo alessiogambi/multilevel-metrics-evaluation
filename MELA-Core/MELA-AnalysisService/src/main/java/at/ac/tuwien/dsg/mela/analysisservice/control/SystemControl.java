@@ -27,23 +27,21 @@ import at.ac.tuwien.dsg.mela.common.requirements.Requirements;
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.ElasticitySpace;
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.ElasticitySpaceFunction;
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.ElSpaceDefaultFunction;
-import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElPthwFunction.EncounterRateElasticityPathway;
+import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElPthwFunction.LightweightEncounterRateElasticityPathway;
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElSgnFunction.som.entities.Neuron;
 import at.ac.tuwien.dsg.mela.analysisservice.engines.InstantMonitoringDataAnalysisEngine;
 import at.ac.tuwien.dsg.mela.analysisservice.engines.DataAggregationEngine;
+import at.ac.tuwien.dsg.mela.analysisservice.gui.ConvertToJSON;
 import at.ac.tuwien.dsg.mela.analysisservice.report.AnalysisReport;
 import at.ac.tuwien.dsg.mela.dataservice.dataSource.AbstractDataAccess;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.DataAccess;
 import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionOperation;
 import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRule;
 import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRulesConfiguration;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.Configuration;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.exceptions.ConfigurationException;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.GangliaFileDataSource;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.RemoteGangliaLiveDataSource;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.GangliaSQLDataSource;
-import java.sql.SQLException;
+import at.ac.tuwien.dsg.mela.dataservice.AggregatedMonitoringDataSQLAccess;
+import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.DataAccess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +52,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 /**
  * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at *
@@ -84,10 +82,13 @@ public class SystemControl {
     //used in determining the service elasticity space
     private ElasticitySpaceFunction elasticitySpaceFunction;
     //temproary. Should support more functions in the future
-    private EncounterRateElasticityPathway elasticityPathway;
+//    private LightweightEncounterRateElasticityPathway elasticityPathway;
     //holding MonitoredElement name, and Actions Name
     private Map<MonitoredElement, String> actionsInExecution;
     private Boolean isElasticityEnabled = Configuration.isElasticityAnalysisEnabled();
+    
+    private AggregatedMonitoringDataSQLAccess aggregatedMonitoringDataSQLAccess;
+    
     //used in monitoring 
     private TimerTask task = new TimerTask() {
         @Override
@@ -97,15 +98,16 @@ public class SystemControl {
     private SystemControl selfReference;
 
     protected SystemControl() {
+//        dataAccess = DataAccesForTestsOnly.createInstance();
+        dataAccess = DataAccess.createInstance();
+
         instantMonitoringDataEnrichmentEngine = new DataAggregationEngine();
         instantMonitoringDataAnalysisEngine = new InstantMonitoringDataAnalysisEngine();
         monitoringTimer = new Timer();
 
-        dataAccess = DataAccess.createInstance();
-
         latestMonitoringData = new ServiceMonitoringSnapshot();
         historicalMonitoringData = new ArrayList<ServiceMonitoringSnapshot>();
-        elasticityPathway = new EncounterRateElasticityPathway();
+
         selfReference = this;
         actionsInExecution = new ConcurrentHashMap<MonitoredElement, String>();
         startMonitoring();
@@ -113,6 +115,8 @@ public class SystemControl {
         if ((int) (monitoringIntervalInSeconds / aggregationWindowsCount) == 0) {
             aggregationWindowsCount = 1 * monitoringIntervalInSeconds;
         }
+
+        aggregatedMonitoringDataSQLAccess = new AggregatedMonitoringDataSQLAccess("mela", "mela");
     }
 
     public MonitoredElement getServiceConfiguration() {
@@ -139,7 +143,7 @@ public class SystemControl {
 
     public synchronized void setServiceConfiguration(MonitoredElement serviceConfiguration) {
         this.serviceConfiguration = serviceConfiguration;
-        elasticitySpaceFunction = new ElSpaceDefaultFunction(serviceConfiguration);
+        elasticitySpaceFunction  = new ElSpaceDefaultFunction(serviceConfiguration);
     }
 
     //actually removes all VMs and Virtual Clusters from the ServiceUnit and adds new ones.
@@ -164,13 +168,13 @@ public class SystemControl {
 
     }
 
-    public List<Neuron> getElPathwayGroups(Map<Metric, List<MetricValue>> map) {
-        if (elasticitySpaceFunction != null && map != null) {
-            return elasticityPathway.getSituationGroups(map);
-        } else {
-            return new ArrayList<Neuron>();
-        }
-    }
+//    public List<Neuron> getElPathwayGroups(Map<Metric, List<MetricValue>> map) {
+//        if (elasticitySpaceFunction != null && map != null) {
+//            return elasticityPathway.getSituationGroups(map);
+//        } else {
+//            return new ArrayList<Neuron>();
+//        }
+//    }
 
     public synchronized Requirements getRequirements() {
         return requirements;
@@ -178,7 +182,7 @@ public class SystemControl {
 
     public synchronized void setRequirements(Requirements requirements) {
         this.requirements = requirements;
-        elasticitySpaceFunction.setRequirements(requirements);
+//        elasticitySpaceFunction.setRequirements(requirements);
     }
 
     public synchronized CompositionRulesConfiguration getCompositionRulesConfiguration() {
@@ -339,8 +343,10 @@ public class SystemControl {
                         latestMonitoringData = selfReference.getAggregatedMonitoringDataOverTime(historicalMonitoringData);
 
                         //if we have no composition function, we have no metrics, so it does not make sense to train the elasticity space
-                        if (isElasticityEnabled && elasticitySpaceFunction != null && compositionRulesConfiguration != null) {
-                            elasticitySpaceFunction.trainElasticitySpace(latestMonitoringData);
+                        if (isElasticityEnabled  && compositionRulesConfiguration != null) {
+                            //write monitoring data in sql
+                            aggregatedMonitoringDataSQLAccess.writeMonitoringData(latestMonitoringData);
+//                            elasticitySpaceFunction.trainElasticitySpace(latestMonitoringData);
                         }
                     } else {
                         //stop the monitoring if the data replay is done
@@ -357,16 +363,75 @@ public class SystemControl {
 //        monitoringTimer.schedule(task, 0,1);
     }
 
-    public ElasticitySpace getElasticitySpace() {
-        if (elasticitySpaceFunction != null) {
-            return elasticitySpaceFunction.getElasticitySpace();
-        } else {
-            Configuration.getLogger().log(Level.WARN, "No elasticity space");
-            return new ElasticitySpace(new MonitoredElement());
-        }
-    }
-
     public synchronized void stopMonitoring() {
         task.cancel();
+    }
+
+    public String getElasticityPathway(MonitoredElement element) {
+
+        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
+
+        //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
+        LightweightEncounterRateElasticityPathway elasticityPathway = null;
+
+        ElasticitySpace tempSpace = new ElasticitySpace(serviceConfiguration);
+        List<Metric> metrics = null;
+        int stepCount = (recordsCount > 10) ? recordsCount / 10 : recordsCount;
+
+        for (int i = 0; i < stepCount; i++) {
+            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(stepCount * 10, 10);
+            if (extractedData != null) {
+                //for each extracted snapshot, train the space
+                for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
+                    tempSpace.addMonitoringData(monitoringSnapshot);
+                }
+            }
+            Map<Metric, List<MetricValue>> map = tempSpace.getMonitoredDataForService(element);
+            if (map != null && metrics == null) {
+                metrics = new ArrayList<Metric>(map.keySet());
+                //we need to know the number of weights to add in instantiation
+                elasticityPathway = new LightweightEncounterRateElasticityPathway(metrics.size());
+            }
+           
+            elasticityPathway.trainElasticityPathway(map);
+            tempSpace.reset();
+        }
+
+        List<Neuron> neurons = elasticityPathway.getSituationGroups();
+        if (metrics == null) {
+            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
+            JSONObject elSpaceJSON = new JSONObject();
+            elSpaceJSON.put("name", "Service not found");
+            return elSpaceJSON.toJSONString();
+        } else {
+            return ConvertToJSON.convertElasticityPathway(metrics, neurons);
+        }
+    }
+    
+    
+    
+    public String getElasticitySpace(MonitoredElement element) {
+
+        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
+        
+        //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
+        List<Metric> metrics = null;
+        int stepCount = (recordsCount > 10) ? recordsCount / 10 : recordsCount;
+
+        for (int i = 0; i < stepCount; i++) {
+            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(stepCount * 10, 10);
+            if (extractedData != null) {
+                //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
+                for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
+                    monitoringSnapshot.keepOnlyDataForElement(element);
+                    elasticitySpaceFunction.trainElasticitySpace(monitoringSnapshot);
+                }
+            }
+        }
+        
+        String jsonRepr = ConvertToJSON.convertElasticitySpace(elasticitySpaceFunction.getElasticitySpace(), element);       
+        elasticitySpaceFunction.resetElasticitySpace();
+        
+        return jsonRepr;
     }
 }

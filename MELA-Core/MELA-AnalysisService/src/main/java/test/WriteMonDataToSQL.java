@@ -18,8 +18,8 @@
 
 package test;
 
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.ClusterInfo;
 import at.ac.tuwien.dsg.mela.dataservice.MonDataSQLWriteAccess;
-import at.ac.tuwien.dsg.mela.dataservice.data.jaxbEntities.ClusterInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.SQLException;

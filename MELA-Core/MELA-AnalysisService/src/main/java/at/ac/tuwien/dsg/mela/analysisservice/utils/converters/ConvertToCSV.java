@@ -33,7 +33,7 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.ServiceMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.ElasticitySpace;
-import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElPthwFunction.EncounterRateElasticityPathway;
+import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElPthwFunction.InMemoryEncounterRateElasticityPathway;
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElSgnFunction.som.entities.Neuron;
 
 
@@ -138,12 +138,12 @@ public class ConvertToCSV {
      * @param destinationFile
      * @throws IOException
      */
-    public static void writeCSVFromElasticitySignature(List<EncounterRateElasticityPathway.SignatureEntry> elasticitySignature, String destinationFile) throws IOException {
+    public static void writeCSVFromElasticitySignature(List<InMemoryEncounterRateElasticityPathway.SignatureEntry> elasticitySignature, String destinationFile) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(destinationFile));
         String columns = null;
 
         //create new list which I can sort
-        List<EncounterRateElasticityPathway.SignatureEntry> sortedAfterOccurrence = new ArrayList<EncounterRateElasticityPathway.SignatureEntry>();
+        List<InMemoryEncounterRateElasticityPathway.SignatureEntry> sortedAfterOccurrence = new ArrayList<InMemoryEncounterRateElasticityPathway.SignatureEntry>();
         sortedAfterOccurrence.addAll(elasticitySignature);
 
 //        //sort list after usage level
@@ -155,9 +155,9 @@ public class ConvertToCSV {
 //        });
 
         //sort after values
-        Collections.sort(sortedAfterOccurrence, new Comparator<EncounterRateElasticityPathway.SignatureEntry>() {
+        Collections.sort(sortedAfterOccurrence, new Comparator<InMemoryEncounterRateElasticityPathway.SignatureEntry>() {
             
-            public int compare(EncounterRateElasticityPathway.SignatureEntry signatureEntry, EncounterRateElasticityPathway.SignatureEntry signatureEntry1) {
+            public int compare(InMemoryEncounterRateElasticityPathway.SignatureEntry signatureEntry, InMemoryEncounterRateElasticityPathway.SignatureEntry signatureEntry1) {
 //                Double sum1 = 0d;
 //                Double sum2 = 0d;
 //
@@ -180,7 +180,7 @@ public class ConvertToCSV {
             }
         });
 
-        for (EncounterRateElasticityPathway.SignatureEntry signatureEntry : sortedAfterOccurrence) {
+        for (InMemoryEncounterRateElasticityPathway.SignatureEntry signatureEntry : sortedAfterOccurrence) {
             //if first time entering loop, write the columns
             if (columns == null) {
                 columns = "USAGE_LEVEL\tUSAGE_LEVEL_INDEX\tUSAGE_PERCENTAGE";

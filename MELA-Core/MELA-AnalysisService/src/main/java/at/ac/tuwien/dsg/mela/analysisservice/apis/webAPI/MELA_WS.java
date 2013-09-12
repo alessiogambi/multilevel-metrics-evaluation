@@ -18,9 +18,7 @@
 package at.ac.tuwien.dsg.mela.analysisservice.apis.webAPI;
 
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.ElasticitySpace;
-import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElSgnFunction.som.entities.Neuron;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.Metric;
-import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MetricValue;
 import at.ac.tuwien.dsg.mela.common.requirements.Requirements;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.ServiceMonitoringSnapshot;
@@ -35,12 +33,10 @@ import at.ac.tuwien.dsg.mela.analysisservice.utils.exceptions.ConfigurationExcep
 import com.thoughtworks.xstream.XStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -75,17 +71,23 @@ public class MELA_WS {
     @Consumes("application/xml")
     @Produces("application/json")
     public String getElasticityPathwayInJSON(MonitoredElement element) {
-        ElasticitySpace elasticitySpace = systemControl.getElasticitySpace();
-        Map<Metric, List<MetricValue>> map = elasticitySpace.getMonitoredDataForService(element);
-        if (map == null) {
-            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
-            JSONObject elSpaceJSON = new JSONObject();
-            elSpaceJSON.put("name", "Service not found");
-            return elSpaceJSON.toJSONString();
-        }
-        List<Neuron> neurons = systemControl.getElPathwayGroups(map);
-        Runtime.getRuntime().gc();
-        return ConvertToJSON.convertElasticityPathway(new ArrayList<Metric>(map.keySet()), neurons);
+//        ElasticitySpace elasticitySpace = systemControl.getElasticitySpace();
+//        Map<Metric, List<MetricValue>> map = elasticitySpace.getMonitoredDataForService(element);
+//        
+//        
+//      ElasticitySpace elasticitySpace = systemControl.getElasticitySpace();
+//        Map<Metric, List<MetricValue>> map = systemControl.getElasticityPathway(element);
+//        
+//        if (map == null) {
+//            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
+//            JSONObject elSpaceJSON = new JSONObject();
+//            elSpaceJSON.put("name", "Service not found");
+//            return elSpaceJSON.toJSONString();
+//        }
+        
+//        Runtime.getRuntime().gc();
+        return  systemControl.getElasticityPathway(element);
+//        return ConvertToJSON.convertElasticityPathway(new ArrayList<Metric>(map.keySet()), neurons);
     }
 
     /**
@@ -100,9 +102,7 @@ public class MELA_WS {
     @Consumes("application/xml")
     @Produces("application/json")
     public String getLatestElasticitySpaceInJSON(MonitoredElement element) {
-        ElasticitySpace elasticitySpace = systemControl.getElasticitySpace();
-        Runtime.getRuntime().gc();
-        return ConvertToJSON.convertElasticitySpace(elasticitySpace, element);
+       return systemControl.getElasticitySpace(element);
     }
 
     /**

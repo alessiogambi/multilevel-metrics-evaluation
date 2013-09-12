@@ -108,8 +108,6 @@ public class ServiceMonitoringSnapshot implements Serializable {
         if (!monitoredData.containsKey(MonitoredElement.getLevel())) {
             return new MonitoredElementMonitoringSnapshot(MonitoredElement, new LinkedHashMap<Metric, MetricValue>());
         }
-        Map<MonitoredElement, MonitoredElementMonitoringSnapshot> filtered = new LinkedHashMap<MonitoredElement, MonitoredElementMonitoringSnapshot>();
-
         for (Map.Entry<MonitoredElement, MonitoredElementMonitoringSnapshot> entry : monitoredData.get(MonitoredElement.getLevel()).entrySet()) {
             if (MonitoredElement.equals(entry.getKey())) {
                 return entry.getValue();
@@ -117,6 +115,28 @@ public class ServiceMonitoringSnapshot implements Serializable {
         }
         return new MonitoredElementMonitoringSnapshot(MonitoredElement, new LinkedHashMap<Metric, MetricValue>());
     }
+    
+    
+    public void keepOnlyDataForElement(MonitoredElement monitoredElement) {
+        if (!monitoredData.containsKey(monitoredElement.getLevel())) {
+            return;
+        }
+
+        MonitoredElementMonitoringSnapshot elementMonitoringSnapshot = null;
+
+        for (Map.Entry<MonitoredElement, MonitoredElementMonitoringSnapshot> entry : monitoredData.get(monitoredElement.getLevel()).entrySet()) {
+            if (monitoredElement.equals(entry.getKey())) {
+                elementMonitoringSnapshot = entry.getValue();
+                break;
+            }
+        }
+
+        monitoredData.clear();
+        if (elementMonitoringSnapshot != null) {
+            this.addMonitoredData(elementMonitoringSnapshot);
+        }
+    }
+
 
    
     public Collection<MonitoredElement> getMonitoredMonitoredElements(MonitoredElement.MonitoredElementLevel level) {

@@ -150,6 +150,13 @@ public abstract class ElasticitySpaceFunction {
     public ElasticitySpace getElasticitySpace() {
         return elasticitySpace;
     }
+    
+    /**
+     * resets the ElasticitySpace to initial state after construction the object
+     */
+    public void resetElasticitySpace() {
+        elasticitySpace.reset();
+    }
 
     /**
      * The two trainElasticitySpace functions have the role of updating the

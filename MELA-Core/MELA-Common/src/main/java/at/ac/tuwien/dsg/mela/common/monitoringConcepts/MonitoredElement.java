@@ -17,6 +17,7 @@
  */
 package at.ac.tuwien.dsg.mela.common.monitoringConcepts;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,7 @@ import java.util.List;
  **/
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "MonitoredElement")
-public class MonitoredElement implements Iterable<MonitoredElement> {
+public class MonitoredElement implements Iterable<MonitoredElement>, Serializable {
 
     @XmlAttribute(name = "id", required = true)
     private String id;
@@ -102,7 +103,7 @@ public class MonitoredElement implements Iterable<MonitoredElement> {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlRootElement(name = "MonitoredElementLevel")
     @XmlEnum
-    public enum MonitoredElementLevel {
+    public enum MonitoredElementLevel implements Serializable{
         @XmlEnumValue("SERVICE")
         SERVICE,
         @XmlEnumValue("SERVICE_TOPOLOGY")

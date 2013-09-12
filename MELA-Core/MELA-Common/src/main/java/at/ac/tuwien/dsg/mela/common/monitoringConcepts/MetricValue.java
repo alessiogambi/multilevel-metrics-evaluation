@@ -17,6 +17,7 @@
  */
 package at.ac.tuwien.dsg.mela.common.monitoringConcepts;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -28,12 +29,12 @@ import java.text.NumberFormat;
  **/
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "MetricValue")
-public class MetricValue implements Comparable<MetricValue> {
+public class MetricValue implements Comparable<MetricValue>,  Serializable {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlRootElement(name = "ValueType")
     @XmlEnum
-    public enum ValueType {
+    public enum ValueType implements Serializable{
 
         @XmlEnumValue("NUMERIC")
         NUMERIC, @XmlEnumValue("TEXT")
