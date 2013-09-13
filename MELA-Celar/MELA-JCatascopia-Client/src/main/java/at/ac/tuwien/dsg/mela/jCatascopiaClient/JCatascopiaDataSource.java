@@ -49,7 +49,7 @@ import org.json.JSONObject;
  */
 public class JCatascopiaDataSource implements DataSourceI {
 
-    private static final String JCATASCOPIA_REST_API_URL = "http://83.212.109.171/jcatascopia/restAPI/";
+    private static final String JCATASCOPIA_REST_API_URL = "http://83.212.112.35/jcatascopia/restAPI";
     private static List<JCatascopiaAgent> poolOfAgents;
     
     static{
@@ -148,7 +148,15 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
             InputStream inputStream = connection.getInputStream();
-            String agentsDescription = inputStream.toString();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));  
+            
+            String agentsDescription = "";
+            
+            String line = "";
+            while ((line=bufferedReader.readLine())!=null){
+                agentsDescription += line;
+            }
+            
             JSONObject object = new JSONObject(agentsDescription);
             if (object.has("agents")) {
                 JSONArray agents = object.getJSONArray("agents");
@@ -244,7 +252,16 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
             InputStream inputStream = connection.getInputStream();
-            String availableMetrics = inputStream.toString();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));  
+            
+            String availableMetrics = "";
+            
+            String line = "";
+            while ((line=bufferedReader.readLine())!=null){
+                availableMetrics += line;
+            }
+            
+            
             JSONObject object = new JSONObject(availableMetrics);
             if (object.has("metrics")) {
                 JSONArray metrics = object.getJSONArray("metrics");
@@ -376,7 +393,14 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
             InputStream inputStream = connection.getInputStream();
-            String availableMetrics = inputStream.toString();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));  
+            
+            String availableMetrics = "";
+            
+            String line = "";
+            while ((line=bufferedReader.readLine())!=null){
+                availableMetrics += line;
+            }
             
             JSONObject object = new JSONObject(availableMetrics);
             if (object.has("metrics")) {

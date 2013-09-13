@@ -62,7 +62,7 @@ public class LightweightEncounterRateElasticityPathway {
         //returning all, such that I can sort them after occurrence and say this pair of values has been encountered 70%
         List<Neuron> neurons = new ArrayList<Neuron>();
         for (Neuron neuron : som) {
-            if (neuron.getMappedWeights()>0) {
+            if (neuron.getMappedWeights() > 0) {
                 neurons.add(neuron);
             }
         }
@@ -121,14 +121,18 @@ public class LightweightEncounterRateElasticityPathway {
 
                 //avoid using non-numeric values. Although a non-numeric value should not happen
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
-                    values.add(Double.parseDouble(value.getValueRepresentation()));
+                    try {
+                        values.add(Double.parseDouble(value.getValueRepresentation()));
+                    } catch (Exception e) {
+                        Configuration.getLogger().log(Level.ERROR, e);
+                    }
                 } else {
                     Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             som.updateMap(new Neuron(values));
         }
-        
+
         //classify all entries
         //not really sure what this for does. I think nothing?
         for (SignatureEntry signatureEntry : mapped) {
@@ -149,7 +153,7 @@ public class LightweightEncounterRateElasticityPathway {
             signatureEntry.mappedNeuron = neuron;
         }
 
-        
+
     }
 
     public class SignatureEntry {

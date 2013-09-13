@@ -340,8 +340,10 @@ public class SystemControl {
                             historicalMonitoringData.remove(0);
                         }
 
-                        latestMonitoringData = selfReference.getAggregatedMonitoringDataOverTime(historicalMonitoringData);
-
+                        if(compositionRulesConfiguration!=null){
+                            latestMonitoringData = selfReference.getAggregatedMonitoringDataOverTime(historicalMonitoringData);
+                        }
+                        
                         //if we have no composition function, we have no metrics, so it does not make sense to train the elasticity space
                         if (isElasticityEnabled  && compositionRulesConfiguration != null) {
                             //write monitoring data in sql
@@ -368,6 +370,15 @@ public class SystemControl {
     }
 
     public String getElasticityPathway(MonitoredElement element) {
+         //if no service configuration, we can't have elasticity space function
+        //if no compositionRulesConfiguration we have no data
+        if(serviceConfiguration == null && compositionRulesConfiguration != null){
+            Configuration.getLogger().log(Level.WARN, "No service configuration or composition rules configuration");
+            JSONObject elSpaceJSON = new JSONObject();
+            elSpaceJSON.put("name", "ElPathway");
+            return elSpaceJSON.toJSONString();
+        }
+        
 
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
 
@@ -411,6 +422,15 @@ public class SystemControl {
     
     
     public String getElasticitySpace(MonitoredElement element) {
+        
+        //if no service configuration, we can't have elasticity space function
+        //if no compositionRulesConfiguration we have no data
+        if(serviceConfiguration == null && compositionRulesConfiguration != null){
+            Configuration.getLogger().log(Level.WARN, "No service configuration or composition rules configuration");
+            JSONObject elSpaceJSON = new JSONObject();
+            elSpaceJSON.put("name", "ElSpace");
+            return elSpaceJSON.toJSONString();
+        }
 
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
         

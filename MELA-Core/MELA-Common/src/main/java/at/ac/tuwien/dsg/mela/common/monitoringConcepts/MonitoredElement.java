@@ -216,9 +216,9 @@ public class MonitoredElement implements Iterable<MonitoredElement>, Serializabl
 
         //do not clone VM level. That is retrieved and updated from monitoring system
         for (MonitoredElement el : containedElements) {
-            if (el.getLevel() != MonitoredElementLevel.VM) {
+//            if (el.getLevel() != MonitoredElementLevel.VM) {
                 elements.add(el.clone());
-            }
+//            }
         }
         newMonitoredElement.containedElements = elements;
         return newMonitoredElement;

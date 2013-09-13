@@ -141,10 +141,10 @@ public class DataAccess extends AbstractDataAccess {
 
             for (MonitoredElement child : processedElement.getContainedElements()) //add empty monitoring data for each serviceStructure element, to serve as a place where in the future composed metrics can be added
             {
-                MonitoredElementMonitoringSnapshot MonitoredElementMonitoringSnapshot = new MonitoredElementMonitoringSnapshot(child, new LinkedHashMap<Metric, MetricValue>());
-                element.addChild(MonitoredElementMonitoringSnapshot);
-                serviceMonitoringSnapshot.addMonitoredData(MonitoredElementMonitoringSnapshot);
-                bfsTraversalQueue.add(MonitoredElementMonitoringSnapshot);
+                MonitoredElementMonitoringSnapshot monitoredElementMonitoringSnapshot = new MonitoredElementMonitoringSnapshot(child, new LinkedHashMap<Metric, MetricValue>());
+                element.addChild(monitoredElementMonitoringSnapshot);
+                serviceMonitoringSnapshot.addMonitoredData(monitoredElementMonitoringSnapshot);
+                bfsTraversalQueue.add(monitoredElementMonitoringSnapshot);
             }
 
         }
@@ -161,6 +161,7 @@ public class DataAccess extends AbstractDataAccess {
             
             //currently we assume for VMs that their ID is their IP (as this si what is unique for them in a single cloud deployment on the same network space)
             MonitoredElement monitoredElement = new MonitoredElement(gangliaHostInfo.getIp());
+            monitoredElement.setLevel(MonitoredElement.MonitoredElementLevel.VM);
             
             //represent all monitored metrics in mapToElasticitySpace
             for (MetricInfo gangliaMetricInfo : gangliaHostInfo.getMetrics()) {
@@ -175,18 +176,19 @@ public class DataAccess extends AbstractDataAccess {
 //                    monitoredElement.setLevel(MonitoredElement.MonitoredElementLevel.SERVICE_UNIT);
 //                }
             }
+            
             //if we have found a metric containing a MonitoredElementID, and if that ID is present in our structure
             //add it as VM level child to the found Service ID (this is the logic under our ganglia deployment so far)
             if (monitoredElement != null && elements.containsKey(monitoredElement)) {
                 //get the monitored element from the supplied service structure,  where is connected with service units
                 MonitoredElement structureElement = elements.get(monitoredElement);
-                MonitoredElement vmLevelElement = new MonitoredElement();
-                vmLevelElement.setId(gangliaHostInfo.getIp());
-                vmLevelElement.setName(gangliaHostInfo.getIp());
-                vmLevelElement.setLevel(MonitoredElement.MonitoredElementLevel.VM);
-                structureElement.addElement(vmLevelElement);
+//                MonitoredElement vmLevelElement = new MonitoredElement();
+//                vmLevelElement.setId(gangliaHostInfo.getIp());
+//                vmLevelElement.setName(gangliaHostInfo.getIp());
+//                vmLevelElement.setLevel(MonitoredElement.MonitoredElementLevel.VM);
+//                structureElement.addElement(vmLevelElement);
 
-                MonitoredElementMonitoringSnapshot monitoredElementMonitoringSnapshot = new MonitoredElementMonitoringSnapshot(vmLevelElement, monitoredMetricValues);
+                MonitoredElementMonitoringSnapshot monitoredElementMonitoringSnapshot = new MonitoredElementMonitoringSnapshot(structureElement, monitoredMetricValues);
 
                 //also add VM monitoring info to children tree
                 serviceMonitoringSnapshot.getMonitoredData(monitoredElement).addChild(monitoredElementMonitoringSnapshot);

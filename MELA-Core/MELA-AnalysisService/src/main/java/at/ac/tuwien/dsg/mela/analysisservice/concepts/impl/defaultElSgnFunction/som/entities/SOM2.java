@@ -222,7 +222,10 @@ public class SOM2 extends SOM {
 //                                    neuron.updateNeuron(neuron2.getMappedWeights());
 //                                }
                                 //just increments with 1 the nr of mappedWeights
-                                neuron.updateNeuron(new Neuron());
+                                //if the neuron has not been used before, do not inchrease usage
+                                if(neuron.getMappedWeights() != 0 ){
+                                    neuron.updateNeuron(new Neuron());
+                                }
                                 neuron2.setMappedWeights(0);
 //                                neuron2.getMappedWeights().clear();
                                 List<Double> newWeights = neuron.getWeights();
