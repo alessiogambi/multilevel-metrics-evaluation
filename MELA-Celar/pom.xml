@@ -17,6 +17,7 @@
 
    <modules>
         <module>MELA-R-SYBL-Client</module>
+        <module>MELA-JCatascopia-Client</module>
    </modules>
 
   <dependencyManagement>
