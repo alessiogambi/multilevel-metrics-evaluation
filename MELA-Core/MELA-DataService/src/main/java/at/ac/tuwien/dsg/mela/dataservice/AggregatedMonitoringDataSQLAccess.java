@@ -21,6 +21,7 @@ package at.ac.tuwien.dsg.mela.dataservice;
 
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.ServiceMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.dataservice.utils.Configuration;
+import com.jcraft.jsch.ConfigRepository;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -56,7 +57,7 @@ public class AggregatedMonitoringDataSQLAccess {
         //BUSY wait used
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/MonitoringDataDB", username, password);
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger().log(Level.ERROR, ex);
                 Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");

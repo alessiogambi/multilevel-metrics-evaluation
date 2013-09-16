@@ -31,14 +31,12 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.MonitoringSy
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.dataAccess.DataSourceI;
 import at.ac.tuwien.dsg.mela.common.exceptions.DataAccessException;
 import at.ac.tuwien.dsg.mela.dataservice.utils.Configuration;
+import com.jcraft.jsch.UserInfo;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.sql.SQLException;
-import java.util.Date;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -91,7 +89,7 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
             final byte[] emptyPassPhrase = new byte[0]; // Empty passphrase for now, get real passphrase from MyUserInfo
 
             jSch.addIdentity(
-                    "ubuntu", // String userName
+                    Configuration.getAccessUserName(), // String userName
                     prvkey, // byte[] privateKey
                     null, // byte[] publicKey //maybe generate a public key and try with it
                     emptyPassPhrase // byte[] passPhrase
@@ -100,32 +98,33 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
             session = jSch.getSession(userName, rootIPAddress, 22);
             session.setConfig("StrictHostKeyChecking", "no"); //         Session session = jSch.getSession("ubuntu", rootIPAddress, 22);
 
-//            UserInfo ui = new UserInfo() {
-//                public String getPassphrase() {
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//
-//                public String getPassword() {
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//
-//                public boolean promptPassword(String string) {
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//
-//                public boolean promptPassphrase(String string) {
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//
-//                public boolean promptYesNo(String string) {
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//
-//                public void showMessage(String string) {
-//                    throw new UnsupportedOperationException("Not supported yet.");
-//                }
-//            }; // MyUserInfo implements UserInfo
-//            session.setUserInfo(ui);
+            
+            UserInfo ui = new UserInfo() {
+                public String getPassphrase() {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                public String getPassword() {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                public boolean promptPassword(String string) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                public boolean promptPassphrase(String string) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                public boolean promptYesNo(String string) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+
+                public void showMessage(String string) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+            }; // MyUserInfo implements UserInfo
+            session.setUserInfo(ui);
             session.connect();
         }
         ChannelExec channel = (ChannelExec) session.openChannel("exec");

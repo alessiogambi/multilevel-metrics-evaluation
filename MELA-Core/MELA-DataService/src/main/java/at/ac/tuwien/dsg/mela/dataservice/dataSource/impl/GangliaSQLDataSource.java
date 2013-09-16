@@ -66,7 +66,7 @@ public class GangliaSQLDataSource implements DataSourceI {
                 connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger().log(Level.ERROR, ex);
-                Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+                Configuration.getLogger().log(Level.WARN, "Could not connect to sql data end. Retrying in 1 second");
             }
             try {
                 Thread.sleep(1000);

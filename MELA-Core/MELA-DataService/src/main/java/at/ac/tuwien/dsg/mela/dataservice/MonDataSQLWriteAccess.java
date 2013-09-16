@@ -6,8 +6,8 @@
  * CELAR FP7 project (FP7-ICT-2011-8 \#317790)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. 
- * You may obtain a copy of the License at
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -31,15 +31,13 @@ import java.util.logging.Logger;
 import org.apache.log4j.Level;
 
 /**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at
  *
  */
 public class MonDataSQLWriteAccess {
 
     private Connection connection;
     private String firstMonitoringSequenceTimestamp;
-    
 
     public MonDataSQLWriteAccess(String username, String password) {
 
@@ -53,7 +51,7 @@ public class MonDataSQLWriteAccess {
         //BUSY wait used
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger().log(Level.ERROR, ex);
                 Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
@@ -90,10 +88,11 @@ public class MonDataSQLWriteAccess {
         //insert timestamp value
         String timestamp = gangliaClusterInfo.getLocaltime();
         try {
-            insertValuesStmt.addBatch("insert into Timestamp (monSeqID, timestamp) VALUES ( (SELECT ID from MonitoringSeq where timestamp=" + firstMonitoringSequenceTimestamp + "), " + timestamp + ")");
+            insertValuesStmt.executeQuery("insert into Timestamp (monSeqID, timestamp) VALUES ( (SELECT ID from MonitoringSeq where timestamp=" + firstMonitoringSequenceTimestamp + "), " + timestamp + ")");
         } catch (SQLException ex) {
             Configuration.getLogger().log(Level.ERROR, ex);
         }
+ 
 
         //for all monitored metrics insert in the metric values 
         for (HostInfo gangliaHostInfo : gangliaClusterInfo.getHostsInfo()) {
@@ -131,7 +130,6 @@ public class MonDataSQLWriteAccess {
     public void closeConnection() throws SQLException {
         connection.close();
     }
-    
 //    public static void main(String[] args){
 //        MonDataSQLWriteAccess access = new MonDataSQLWriteAccess("mela", "mela");
 //    }

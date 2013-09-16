@@ -95,7 +95,7 @@ public class SystemControl {
         public void run() {
         }
     };
-    private SystemControl selfReference;
+//    private SystemControl selfReference;
 
     protected SystemControl() {
 //        dataAccess = DataAccesForTestsOnly.createInstance();
@@ -108,7 +108,7 @@ public class SystemControl {
         latestMonitoringData = new ServiceMonitoringSnapshot();
         historicalMonitoringData = new ArrayList<ServiceMonitoringSnapshot>();
 
-        selfReference = this;
+//        selfReference = this;
         actionsInExecution = new ConcurrentHashMap<MonitoredElement, String>();
         startMonitoring();
 
@@ -326,13 +326,13 @@ public class SystemControl {
         return latestMonitoringData;
     }
 
-    public synchronized void startMonitoring() {
+    private final synchronized void startMonitoring() {
 
         task = new TimerTask() {
             @Override
             public void run() {
                 if (serviceConfiguration != null) {
-                    ServiceMonitoringSnapshot monitoringData = selfReference.getRawMonitoringData();
+                    ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
                     if (monitoringData != null) {
                         historicalMonitoringData.add(monitoringData);
                         //remove the oldest and add the new value always
@@ -341,7 +341,7 @@ public class SystemControl {
                         }
 
                         if(compositionRulesConfiguration!=null){
-                            latestMonitoringData = selfReference.getAggregatedMonitoringDataOverTime(historicalMonitoringData);
+                            latestMonitoringData = getAggregatedMonitoringDataOverTime(historicalMonitoringData);
                         }
                         
                         //if we have no composition function, we have no metrics, so it does not make sense to train the elasticity space
@@ -390,7 +390,7 @@ public class SystemControl {
         int stepCount = (recordsCount > 10) ? recordsCount / 10 : recordsCount;
 
         for (int i = 0; i < stepCount; i++) {
-            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(stepCount * 10, 10);
+            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(i * 10, 10);
             if (extractedData != null) {
                 //for each extracted snapshot, train the space
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
@@ -439,7 +439,7 @@ public class SystemControl {
         int stepCount = (recordsCount > 10) ? recordsCount / 10 : recordsCount;
 
         for (int i = 0; i < stepCount; i++) {
-            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(stepCount * 10, 10);
+            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(i * 10, 10);
             if (extractedData != null) {
                 //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
