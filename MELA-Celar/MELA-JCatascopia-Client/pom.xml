@@ -23,13 +23,7 @@
             <version>0.1-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
-        <!--      <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-            <type>jar</type>
-        </dependency>
-        -->
+      
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -50,4 +44,20 @@
         </dependency>
     
     </dependencies>
+    
+    
+    <build>
+        <plugins>
+        
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.1</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
