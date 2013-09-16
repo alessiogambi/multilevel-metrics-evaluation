@@ -109,4 +109,12 @@ public class Configuration {
     public static String getStoredMonitoringSequenceID() {
         return configuration.getProperty("MONITORING_SEQ_ID");
     }
+
+    public static int getDataServicePort() {
+        if (configuration.containsKey("DATA_SERVICE_PORT")) {
+            return Integer.parseInt(configuration.getProperty("DATA_SERVICE_PORT"));
+        } else {
+            return 9123; //default 2 frames
+        }
+    }
 }

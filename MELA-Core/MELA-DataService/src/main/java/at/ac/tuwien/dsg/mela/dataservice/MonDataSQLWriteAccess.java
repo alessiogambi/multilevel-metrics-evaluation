@@ -39,6 +39,7 @@ public class MonDataSQLWriteAccess {
 
     private Connection connection;
     private String firstMonitoringSequenceTimestamp;
+    
 
     public MonDataSQLWriteAccess(String username, String password) {
 
@@ -52,7 +53,7 @@ public class MonDataSQLWriteAccess {
         //BUSY wait used
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost/MonitoringDataDB", username, password);
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger().log(Level.ERROR, ex);
                 Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
@@ -130,4 +131,8 @@ public class MonDataSQLWriteAccess {
     public void closeConnection() throws SQLException {
         connection.close();
     }
+    
+//    public static void main(String[] args){
+//        MonDataSQLWriteAccess access = new MonDataSQLWriteAccess("mela", "mela");
+//    }
 }
