@@ -1,11 +1,13 @@
 /**
- * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group E184
+ * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group
+ * E184
  *
- * This work was partially supported by the European Commission in terms of the CELAR FP7 project (FP7-ICT-2011-8 \#317790)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at
+ * This work was partially supported by the European Commission in terms of the
+ * CELAR FP7 project (FP7-ICT-2011-8 \#317790)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -33,15 +35,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
-
 /**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
-
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at *
  *
- * Supports multiple operations. Such as "DIV (SUM COST) (KEEP CONNECTIONS) or SUM( KEEP
- * COST)
+ * Supports multiple operations. Such as "DIV (SUM COST) (KEEP CONNECTIONS) or
+ * SUM( KEEP COST)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "Operation")
@@ -172,7 +170,7 @@ public class CompositionOperation {
      */
     public MetricValue apply(MonitoredElementMonitoringSnapshot elementMonitoringSnapshot) {
 
-        MetricValue result = new MetricValue();
+        MetricValue result = new MetricValue(Double.NaN);
 
         // operations done on result
         // for example SUM will place the sum on result[0]
@@ -214,7 +212,10 @@ public class CompositionOperation {
         //the idea is to be able to say "for metric Children from Service level, divide with (SUM Cost (Service topology level))
 
         for (CompositionOperation subOperation : this.subOperations) {
-            valuesToBeProcessed.add(subOperation.apply(elementMonitoringSnapshot));
+            MetricValue subOperationValue = subOperation.apply(elementMonitoringSnapshot);
+            if (subOperationValue != null) {
+                valuesToBeProcessed.add(subOperationValue);
+            }
         }
 
         //if the operation includes a simple value, try to convert to double 
@@ -227,55 +228,63 @@ public class CompositionOperation {
         //apply operation on sequence of values
         switch (operationType) {
             case ADD:
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
-                        metricValue.setValue(((Number) metricValue.getValue())
-                                .doubleValue() + operator);
+                if (!valuesToBeProcessed.isEmpty()) {
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
+                            metricValue.setValue(((Number) metricValue.getValue())
+                                    .doubleValue() + operator);
+                        }
                     }
+                    result = valuesToBeProcessed.get(0);
                 }
-                result = valuesToBeProcessed.get(0);
                 break;
             case AVG: {
-                Double avg = 0.0d;
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
-                        avg += (((Number) metricValue.getValue()).doubleValue());
+                if (!valuesToBeProcessed.isEmpty()) {
+                    Double avg = 0.0d;
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
+                            avg += (((Number) metricValue.getValue()).doubleValue());
+                        }
                     }
+                    MetricValue metricValue = new MetricValue();
+                    metricValue.setValue(avg / valuesToBeProcessed.size());
+                    result = metricValue;
                 }
-                MetricValue metricValue = new MetricValue();
-                metricValue.setValue(avg / valuesToBeProcessed.size());
-                result = metricValue;
             }
             break;
             case CONCAT: {
-                String concat = "";
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    concat += metricValue.getValue().toString() + ",";
+                if (!valuesToBeProcessed.isEmpty()) {
+                    String concat = "";
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        concat += metricValue.getValue().toString() + ",";
+                    }
+                    MetricValue metricValue = new MetricValue();
+                    metricValue.setValue(concat);
+                    result = metricValue;
                 }
-                MetricValue metricValue = new MetricValue();
-                metricValue.setValue(concat);
-                result = metricValue;
             }
             break;
             case DIV: {
-                MetricValue metricValue = new MetricValue();
-                Double firstOperand = ((Number) valuesToBeProcessed.get(0).getValue()).doubleValue();
-                Double secondOperand;
+                if (!valuesToBeProcessed.isEmpty()) {
+                    MetricValue metricValue = new MetricValue();
+                    Double firstOperand = ((Number) valuesToBeProcessed.get(0).getValue()).doubleValue();
+                    Double secondOperand;
 
-                if (valuesToBeProcessed.size() > 1) {
-                    secondOperand = ((Number) valuesToBeProcessed.get(1).getValue()).doubleValue();
-                } else {
-                    secondOperand = operator;
+                    if (valuesToBeProcessed.size() > 1) {
+                        secondOperand = ((Number) valuesToBeProcessed.get(1).getValue()).doubleValue();
+                    } else {
+                        secondOperand = operator;
+                    }
+
+                    if (secondOperand != 0) {
+                        metricValue.setValue(firstOperand / secondOperand);
+
+                    } else {
+                        metricValue.setValue(firstOperand);
+                    }
+
+                    result = metricValue;
                 }
-
-                if (secondOperand != 0) {
-                    metricValue.setValue(firstOperand / secondOperand);
-
-                } else {
-                    metricValue.setValue(firstOperand);
-                }
-
-                result = metricValue;
             }
             break;
             case KEEP:
@@ -285,90 +294,106 @@ public class CompositionOperation {
                 }
                 break;
             case MAX: {
-                Double max = 0.0d;
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
-                        if (max < (((Number) metricValue.getValue())
-                                .doubleValue())) {
-                            max = (((Number) metricValue.getValue())
-                                    .doubleValue());
+                if (!valuesToBeProcessed.isEmpty()) {
+                    Double max = 0.0d;
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
+                            if (max < (((Number) metricValue.getValue())
+                                    .doubleValue())) {
+                                max = (((Number) metricValue.getValue())
+                                        .doubleValue());
+                            }
                         }
                     }
+                    MetricValue metricValue = new MetricValue();
+                    metricValue.setValue(max);
+                    result = metricValue;
                 }
-                MetricValue metricValue = new MetricValue();
-                metricValue.setValue(max);
-                result = metricValue;
             }
             break;
             case MIN: {
-                Double min = 0.0d;
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
-                        if (min > (((Number) metricValue.getValue())
-                                .doubleValue())) {
-                            min = (((Number) metricValue.getValue())
-                                    .doubleValue());
+                if (!valuesToBeProcessed.isEmpty()) {
+                    Double min = 0.0d;
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
+                            if (min > (((Number) metricValue.getValue())
+                                    .doubleValue())) {
+                                min = (((Number) metricValue.getValue())
+                                        .doubleValue());
+                            }
                         }
                     }
+                    MetricValue metricValue = new MetricValue();
+                    metricValue.setValue(min);
+                    result = metricValue;
                 }
-                MetricValue metricValue = new MetricValue();
-                metricValue.setValue(min);
-                result = metricValue;
             }
             break;
             case MUL: {
-                MetricValue metricValue = new MetricValue();
-                Double firstOperand = ((Number) valuesToBeProcessed.get(0).getValue()).doubleValue();
-                Double secondOperand;
+                if (!valuesToBeProcessed.isEmpty()) {
+                    MetricValue metricValue = new MetricValue();
+                    Double firstOperand = ((Number) valuesToBeProcessed.get(0).getValue()).doubleValue();
+                    Double secondOperand;
 
-                if (valuesToBeProcessed.size() > 1) {
-                    secondOperand = ((Number) valuesToBeProcessed.get(1).getValue()).doubleValue();
-                } else {
-                    secondOperand = operator;
+                    if (valuesToBeProcessed.size() > 1) {
+                        secondOperand = ((Number) valuesToBeProcessed.get(1).getValue()).doubleValue();
+                    } else {
+                        secondOperand = operator;
+                    }
+
+                    metricValue.setValue(firstOperand * secondOperand);
+
+                    result = metricValue;
                 }
-
-                metricValue.setValue(firstOperand * secondOperand);
-
-                result = metricValue;
             }
             break;
             case SUB:
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
-                        metricValue.setValue((((Number) metricValue.getValue())
-                                .doubleValue()) - operator);
+                if (!valuesToBeProcessed.isEmpty()) {
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
+                            metricValue.setValue((((Number) metricValue.getValue())
+                                    .doubleValue()) - operator);
+                        }
                     }
+                    result = valuesToBeProcessed.get(0);
                 }
-                result = valuesToBeProcessed.get(0);
                 break;
             case SUM: {
-                Double sum = 0.0d;
-                for (MetricValue metricValue : valuesToBeProcessed) {
-                    if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
-                        sum += (((Number) metricValue.getValue()).doubleValue());
+                if (!valuesToBeProcessed.isEmpty()) {
+                    Double sum = 0.0d;
+                    for (MetricValue metricValue : valuesToBeProcessed) {
+                        if (metricValue.getValueType() == MetricValue.ValueType.NUMERIC) {
+                            sum += (((Number) metricValue.getValue()).doubleValue());
+                        }
                     }
+                    MetricValue metricValue = new MetricValue();
+                    metricValue.setValue(sum);
+                    result = metricValue;
                 }
-                MetricValue metricValue = new MetricValue();
-                metricValue.setValue(sum);
-                result = metricValue;
             }
             break;
             case UNION:
                 break;
             case KEEP_LAST: {
-                MetricValue metricValue = valuesToBeProcessed.get(valuesToBeProcessed.size() - 1);
-                result = metricValue;
+                if (!valuesToBeProcessed.isEmpty()) {
+                    MetricValue metricValue = valuesToBeProcessed.get(valuesToBeProcessed.size() - 1);
+                    result = metricValue;
+                }
             }
             break;
             case KEEP_FIRST: {
-                MetricValue metricValue = valuesToBeProcessed.get(0);
-                result = metricValue;
+                if (!valuesToBeProcessed.isEmpty()) {
+                    MetricValue metricValue = valuesToBeProcessed.get(0);
+                    result = metricValue;
+                }
             }
             break;
             case SET_VALUE: {
-                MetricValue metricValue = new MetricValue();
-                metricValue.setValue(operator);
-                result = metricValue;
+                if (!valuesToBeProcessed.isEmpty()) {
+                    MetricValue metricValue = new MetricValue();
+                    metricValue.setValue(operator);
+                    result = metricValue;
+                }
             }
             break;
             default:
