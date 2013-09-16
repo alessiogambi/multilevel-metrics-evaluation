@@ -243,7 +243,11 @@ public class SystemControl {
     }
 
     public synchronized ServiceMonitoringSnapshot getAggregatedMonitoringDataOverTime(List<ServiceMonitoringSnapshot> serviceMonitoringSnapshots) {
-        return instantMonitoringDataEnrichmentEngine.aggregateMonitoringDataOverTime(compositionRulesConfiguration, serviceMonitoringSnapshots);
+        if(serviceMonitoringSnapshots.size() > 1){
+            return instantMonitoringDataEnrichmentEngine.aggregateMonitoringDataOverTime(compositionRulesConfiguration, serviceMonitoringSnapshots);
+        }else{
+            return instantMonitoringDataEnrichmentEngine.enrichMonitoringData(compositionRulesConfiguration, serviceMonitoringSnapshots.get(0));
+        }
     }
 
     private synchronized ServiceMonitoringSnapshot getAggregatedMonitoringData(ServiceMonitoringSnapshot rawMonitoringData) {
