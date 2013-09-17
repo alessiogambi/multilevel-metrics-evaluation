@@ -389,11 +389,9 @@ public class CompositionOperation {
             }
             break;
             case SET_VALUE: {
-                if (!valuesToBeProcessed.isEmpty()) {
                     MetricValue metricValue = new MetricValue();
                     metricValue.setValue(operator);
                     result = metricValue;
-                }
             }
             break;
             default:
