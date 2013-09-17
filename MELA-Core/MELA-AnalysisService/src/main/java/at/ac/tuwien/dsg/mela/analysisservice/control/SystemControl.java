@@ -144,6 +144,9 @@ public class SystemControl {
     public synchronized void setServiceConfiguration(MonitoredElement serviceConfiguration) {
         this.serviceConfiguration = serviceConfiguration;
         elasticitySpaceFunction  = new ElSpaceDefaultFunction(serviceConfiguration);
+        if(requirements!= null){
+            elasticitySpaceFunction.setRequirements(requirements);
+        }
     }
 
     //actually removes all VMs and Virtual Clusters from the ServiceUnit and adds new ones.
@@ -182,7 +185,7 @@ public class SystemControl {
 
     public synchronized void setRequirements(Requirements requirements) {
         this.requirements = requirements;
-//        elasticitySpaceFunction.setRequirements(requirements);
+        elasticitySpaceFunction.setRequirements(requirements);
     }
 
     public synchronized CompositionRulesConfiguration getCompositionRulesConfiguration() {
@@ -438,6 +441,7 @@ public class SystemControl {
 
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
         
+        
         //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
         List<Metric> metrics = null;
         int stepCount = (recordsCount > 100) ? recordsCount / 100 : 1;
@@ -454,7 +458,11 @@ public class SystemControl {
         }
         
         String jsonRepr = ConvertToJSON.convertElasticitySpace(elasticitySpaceFunction.getElasticitySpace(), element);       
+//        elasticitySpaceFunction = new ElSpaceDefaultFunction(serviceConfiguration);
         elasticitySpaceFunction.resetElasticitySpace();
+        if(requirements!= null){
+            elasticitySpaceFunction.setRequirements(requirements);
+        }
         
         return jsonRepr;
     }

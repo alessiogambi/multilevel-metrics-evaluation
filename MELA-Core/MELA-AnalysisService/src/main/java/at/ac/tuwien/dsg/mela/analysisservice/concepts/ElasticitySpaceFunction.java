@@ -1,11 +1,13 @@
 /**
- * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group E184
+ * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group
+ * E184
  *
- * This work was partially supported by the European Commission in terms of the CELAR FP7 project (FP7-ICT-2011-8 \#317790)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at
+ * This work was partially supported by the European Commission in terms of the
+ * CELAR FP7 project (FP7-ICT-2011-8 \#317790)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,12 +30,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-
 /**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
-
- **/
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at  *
+ *
+ */
 public abstract class ElasticitySpaceFunction {
     //this contains the service structure with a single VM per Service Unit
     //to be able to say for VMs from Service_Unit X these are the elasticity limits
@@ -150,12 +150,33 @@ public abstract class ElasticitySpaceFunction {
     public ElasticitySpace getElasticitySpace() {
         return elasticitySpace;
     }
-    
+
     /**
      * resets the ElasticitySpace to initial state after construction the object
      */
     public void resetElasticitySpace() {
         elasticitySpace.reset();
+        //gets clone without VM level elements such that I can combine all VMs into 1 and retrieve a set of common boundaries
+//        elasticitySpace = new ElasticitySpace(serviceStructure);
+        //add generic VM per each service unit
+
+        ServiceMonitoringSnapshot upperBoundary = elasticitySpace.getElasticitySpaceBoundary().getUpperBoundary();
+        ServiceMonitoringSnapshot lowerBoundary = elasticitySpace.getElasticitySpaceBoundary().getLowerBoundary();
+
+        List<MonitoredElement> processingList = new ArrayList<MonitoredElement>();
+        processingList.add(serviceStructure);
+
+        //DFS traversal until I get ServiceUnit level. Need to change this when we also insert VirtualClusters
+        while (!processingList.isEmpty()) {
+            MonitoredElement element = processingList.remove(processingList.size() - 1);
+
+            //create empty boundaries for each element
+            upperBoundary.addMonitoredData(new MonitoredElementMonitoringSnapshot(element));
+            lowerBoundary.addMonitoredData(new MonitoredElementMonitoringSnapshot(element));
+
+            processingList.addAll(element.getContainedElements());
+        }
+//        System.out.println(serviceStructure);
     }
 
     /**

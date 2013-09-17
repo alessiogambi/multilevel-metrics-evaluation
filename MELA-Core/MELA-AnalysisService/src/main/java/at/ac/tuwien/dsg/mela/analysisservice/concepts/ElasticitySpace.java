@@ -187,9 +187,9 @@ import java.util.*;
       */
      public void reset() {
 
-         spaceEntries = new ArrayList<ElasticitySpaceEntry>();
+         spaceEntries.clear();
          elasticitySpaceBoundary = new ElasticitySpaceBoundary();
-         monitoringData = new LinkedHashMap<MonitoredElement, Map<Metric, List<MetricValue>>>();
+         monitoringData.clear();
 
          //create the monitoring data structure
          List<MonitoredElement> queue = new ArrayList<MonitoredElement>();

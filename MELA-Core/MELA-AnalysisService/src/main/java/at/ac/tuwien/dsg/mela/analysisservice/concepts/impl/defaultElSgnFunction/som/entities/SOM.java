@@ -626,10 +626,13 @@ public class SOM implements Iterable<Neuron> {
 
         for (int i = 0; i < weights.size(); i++) {
             Double oldVal = weights.get(i);
-            //to analzye bets values for distanceRestraintFactor
-            Double newVal = oldVal + distanceRestraintFactor * learningFactor * (neuronWeights.get(i) - oldVal);
-            newVal = Double.parseDouble(decimalFormat.format(newVal));
-            weights.set(i, newVal);
+            //to analzye best values for distanceRestraintFactor
+            //check if the two neurons have same cardinality
+            if(neuronWeights.size()>i){
+                Double newVal = oldVal + distanceRestraintFactor * learningFactor * (neuronWeights.get(i) - oldVal);
+                newVal = Double.parseDouble(decimalFormat.format(newVal));
+                weights.set(i, newVal);
+            }
         }
 
 
