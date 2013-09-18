@@ -379,8 +379,8 @@ public class SystemControl {
     public String getElasticityPathway(MonitoredElement element) {
          //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
-        if(serviceConfiguration == null && compositionRulesConfiguration != null){
-            Configuration.getLogger().log(Level.WARN, "No service configuration or composition rules configuration");
+         if(!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null){
+            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElPathway");
             return elSpaceJSON.toJSONString();
@@ -432,8 +432,8 @@ public class SystemControl {
         
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
-        if(serviceConfiguration == null && compositionRulesConfiguration != null){
-            Configuration.getLogger().log(Level.WARN, "No service configuration or composition rules configuration");
+        if(!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null){
+            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElSpace");
             return elSpaceJSON.toJSONString();
