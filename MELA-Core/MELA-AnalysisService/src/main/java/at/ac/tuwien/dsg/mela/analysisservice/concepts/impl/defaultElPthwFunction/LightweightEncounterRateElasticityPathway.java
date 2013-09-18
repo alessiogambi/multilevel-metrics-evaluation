@@ -144,7 +144,8 @@ public class LightweightEncounterRateElasticityPathway {
 
                 //avoid using non-numeric values. Although a non-numeric value should not happen
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
-                    values.add(Double.parseDouble(value.getValueRepresentation()));
+                    Number nr = (Number) value.getValue();
+                    values.add(nr.doubleValue());
                 } else {
                     Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
