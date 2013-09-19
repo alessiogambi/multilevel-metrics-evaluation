@@ -86,9 +86,7 @@ public class SystemControl {
     //holding MonitoredElement name, and Actions Name
     private Map<MonitoredElement, String> actionsInExecution;
     private Boolean isElasticityEnabled = Configuration.isElasticityAnalysisEnabled();
-    
     private AggregatedMonitoringDataSQLAccess aggregatedMonitoringDataSQLAccess;
-    
     //used in monitoring 
     private TimerTask task = new TimerTask() {
         @Override
@@ -143,8 +141,8 @@ public class SystemControl {
 
     public synchronized void setServiceConfiguration(MonitoredElement serviceConfiguration) {
         this.serviceConfiguration = serviceConfiguration;
-        elasticitySpaceFunction  = new ElSpaceDefaultFunction(serviceConfiguration);
-        if(requirements!= null){
+        elasticitySpaceFunction = new ElSpaceDefaultFunction(serviceConfiguration);
+        if (requirements != null) {
             elasticitySpaceFunction.setRequirements(requirements);
         }
     }
@@ -178,7 +176,6 @@ public class SystemControl {
 //            return new ArrayList<Neuron>();
 //        }
 //    }
-
     public synchronized Requirements getRequirements() {
         return requirements;
     }
@@ -246,9 +243,9 @@ public class SystemControl {
     }
 
     public synchronized ServiceMonitoringSnapshot getAggregatedMonitoringDataOverTime(List<ServiceMonitoringSnapshot> serviceMonitoringSnapshots) {
-        if(serviceMonitoringSnapshots.size() > 1){
+        if (serviceMonitoringSnapshots.size() > 1) {
             return instantMonitoringDataEnrichmentEngine.aggregateMonitoringDataOverTime(compositionRulesConfiguration, serviceMonitoringSnapshots);
-        }else{
+        } else {
             return instantMonitoringDataEnrichmentEngine.enrichMonitoringData(compositionRulesConfiguration, serviceMonitoringSnapshots.get(0));
         }
     }
@@ -347,12 +344,12 @@ public class SystemControl {
                             historicalMonitoringData.remove(0);
                         }
 
-                        if(compositionRulesConfiguration!=null){
+                        if (compositionRulesConfiguration != null) {
                             latestMonitoringData = getAggregatedMonitoringDataOverTime(historicalMonitoringData);
                         }
-                        
+
                         //if we have no composition function, we have no metrics, so it does not make sense to train the elasticity space
-                        if (isElasticityEnabled  && compositionRulesConfiguration != null) {
+                        if (isElasticityEnabled && compositionRulesConfiguration != null) {
                             //write monitoring data in sql
                             aggregatedMonitoringDataSQLAccess.writeMonitoringData(latestMonitoringData);
 //                            elasticitySpaceFunction.trainElasticitySpace(latestMonitoringData);
@@ -376,16 +373,17 @@ public class SystemControl {
         task.cancel();
     }
 
-    public String getElasticityPathway(MonitoredElement element) {
-         //if no service configuration, we can't have elasticity space function
+    //performs multiple database interrogations (avids using memory)
+    public String getElasticityPathwayLazy(MonitoredElement element) {
+        //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
-         if(!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null){
+        if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
             Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElPathway");
             return elSpaceJSON.toJSONString();
         }
-        
+
 
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
 
@@ -410,7 +408,7 @@ public class SystemControl {
                 //we need to know the number of weights to add in instantiation
                 elasticityPathway = new LightweightEncounterRateElasticityPathway(metrics.size());
             }
-           
+
             elasticityPathway.trainElasticityPathway(map);
             tempSpace.reset();
         }
@@ -425,14 +423,13 @@ public class SystemControl {
             return ConvertToJSON.convertElasticityPathway(metrics, neurons);
         }
     }
-    
-    
-    
-    public String getElasticitySpace(MonitoredElement element) {
-        
+
+    //performs multiple database interrogations (avids using memory)
+    public String getElasticitySpaceLazy(MonitoredElement element) {
+
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
-        if(!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null){
+        if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
             Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElSpace");
@@ -440,8 +437,8 @@ public class SystemControl {
         }
 
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
-        
-        
+
+
         //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
         List<Metric> metrics = null;
         int stepCount = (recordsCount > 100) ? recordsCount / 100 : 1;
@@ -456,14 +453,97 @@ public class SystemControl {
                 }
             }
         }
-        
-        String jsonRepr = ConvertToJSON.convertElasticitySpace(elasticitySpaceFunction.getElasticitySpace(), element);       
+
+        String jsonRepr = ConvertToJSON.convertElasticitySpace(elasticitySpaceFunction.getElasticitySpace(), element);
 //        elasticitySpaceFunction = new ElSpaceDefaultFunction(serviceConfiguration);
         elasticitySpaceFunction.resetElasticitySpace();
-        if(requirements!= null){
+        if (requirements != null) {
             elasticitySpaceFunction.setRequirements(requirements);
         }
-        
+
+        return jsonRepr;
+    }
+
+    //uses a lot of memory (all directly in memory)
+    public String getElasticityPathway(MonitoredElement element) {
+        //if no service configuration, we can't have elasticity space function
+        //if no compositionRulesConfiguration we have no data
+        if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
+            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
+            JSONObject elSpaceJSON = new JSONObject();
+            elSpaceJSON.put("name", "ElPathway");
+            return elSpaceJSON.toJSONString();
+        }
+
+        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
+
+        //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
+        LightweightEncounterRateElasticityPathway elasticityPathway = null;
+
+        ElasticitySpace tempSpace = new ElasticitySpace(serviceConfiguration);
+        List<Metric> metrics = null;
+
+        List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData();
+        if (extractedData != null) {
+            //for each extracted snapshot, train the space
+            for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
+                tempSpace.addMonitoringData(monitoringSnapshot);
+            }
+        }
+        Map<Metric, List<MetricValue>> map = tempSpace.getMonitoredDataForService(element);
+        if (map != null && metrics == null) {
+            metrics = new ArrayList<Metric>(map.keySet());
+            //we need to know the number of weights to add in instantiation
+            elasticityPathway = new LightweightEncounterRateElasticityPathway(metrics.size());
+        }
+
+        elasticityPathway.trainElasticityPathway(map);
+        tempSpace.reset();
+
+        List<Neuron> neurons = elasticityPathway.getSituationGroups();
+        if (metrics == null) {
+            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
+            JSONObject elSpaceJSON = new JSONObject();
+            elSpaceJSON.put("name", "Service not found");
+            return elSpaceJSON.toJSONString();
+        } else {
+            return ConvertToJSON.convertElasticityPathway(metrics, neurons);
+        }
+    }
+
+    public String getElasticitySpace(MonitoredElement element) {
+
+        //if no service configuration, we can't have elasticity space function
+        //if no compositionRulesConfiguration we have no data
+        if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
+            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
+            JSONObject elSpaceJSON = new JSONObject();
+            elSpaceJSON.put("name", "ElSpace");
+            return elSpaceJSON.toJSONString();
+        }
+
+        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
+
+
+        //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
+        List<Metric> metrics = null;
+
+        List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData();
+        if (extractedData != null) {
+            //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
+            for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
+                monitoringSnapshot.keepOnlyDataForElement(element);
+                elasticitySpaceFunction.trainElasticitySpace(monitoringSnapshot);
+            }
+        }
+
+        String jsonRepr = ConvertToJSON.convertElasticitySpace(elasticitySpaceFunction.getElasticitySpace(), element);
+//        elasticitySpaceFunction = new ElSpaceDefaultFunction(serviceConfiguration);
+        elasticitySpaceFunction.resetElasticitySpace();
+        if (requirements != null) {
+            elasticitySpaceFunction.setRequirements(requirements);
+        }
+
         return jsonRepr;
     }
 }

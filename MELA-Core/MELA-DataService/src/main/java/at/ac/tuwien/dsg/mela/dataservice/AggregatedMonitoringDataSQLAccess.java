@@ -217,6 +217,50 @@ public class AggregatedMonitoringDataSQLAccess {
             return monitoringSnapshots;
         }
     }
+    
+    
+    
+    /**
+     *
+     * @param startIndex from which monitored entry ID to start extracting
+     * @param count max number of elements to return
+     * @return returns maximum count elements
+     */
+    public List<ServiceMonitoringSnapshot> extractMonitoringData() {
+        Connection connection = getConnection();
+        PreparedStatement getMonitoringEntryPreparedStatement = null;
+        {
+            try {
+                String sql = "SELECT data from " + AGGREGATED_DATA_TABLE_NAME + ";";
+                getMonitoringEntryPreparedStatement = connection.prepareStatement(sql);
+            } catch (SQLException ex) {
+                Configuration.getLogger().log(Level.ERROR, ex);
+            }
+        }
+
+
+        List<ServiceMonitoringSnapshot> monitoringSnapshots = new ArrayList<ServiceMonitoringSnapshot>();
+        try {
+            ResultSet resultSet = getMonitoringEntryPreparedStatement.executeQuery();
+            if (resultSet != null) {
+
+                while (resultSet.next()) {
+                    ServiceMonitoringSnapshot monitoringSnapshot = (ServiceMonitoringSnapshot) resultSet.getObject(1);
+                    monitoringSnapshots.add(monitoringSnapshot);
+                }
+            }
+
+        } catch (SQLException ex) {
+            Configuration.getLogger().log(Level.ERROR, ex);
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+            return monitoringSnapshots;
+        }
+    }
 
 //   
 //        
