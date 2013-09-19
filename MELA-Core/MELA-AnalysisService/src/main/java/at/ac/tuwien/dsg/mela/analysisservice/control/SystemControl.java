@@ -365,7 +365,7 @@ public class SystemControl {
             }
         };
         //repeat the monitoring every monitoringIntervalInSeconds seconds 
-        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
+        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 500);
 //        monitoringTimer.schedule(task, 0,1);
     }
 
@@ -392,10 +392,10 @@ public class SystemControl {
 
         ElasticitySpace tempSpace = new ElasticitySpace(serviceConfiguration);
         List<Metric> metrics = null;
-        int stepCount = (recordsCount > 1000) ? recordsCount / 1000 : 1;
+        int stepCount = (recordsCount > 500) ? recordsCount / 500 : 1;
 
         for (int i = 0; i < stepCount; i++) {
-            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(i * 1000, 1000);
+            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(i * 500, 500);
             if (extractedData != null) {
                 //for each extracted snapshot, train the space
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
@@ -441,10 +441,10 @@ public class SystemControl {
 
         //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
         List<Metric> metrics = null;
-        int stepCount = (recordsCount > 1000) ? recordsCount / 1000 : 1;
+        int stepCount = (recordsCount > 500) ? recordsCount / 500 : 1;
 
         for (int i = 0; i < stepCount; i++) {
-            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(i * 1000, 1000);
+            List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData(i * 500, 500);
             if (extractedData != null) {
                 //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
