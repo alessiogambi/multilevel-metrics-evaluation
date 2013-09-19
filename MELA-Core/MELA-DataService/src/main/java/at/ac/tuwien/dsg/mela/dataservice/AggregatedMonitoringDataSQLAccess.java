@@ -102,7 +102,7 @@ public class AggregatedMonitoringDataSQLAccess {
                 Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
         }
- 
+
 
         return connection;
     }
@@ -140,7 +140,7 @@ public class AggregatedMonitoringDataSQLAccess {
     //gets the maximum ID encountered
     public int getRecordsCount() {
         Connection connection = getConnection();
-        PreparedStatement getEntriesCountPreparedStatement=null;
+        PreparedStatement getEntriesCountPreparedStatement = null;
         {
             try {
                 String sql = "SELECT MAX(ID) from " + AGGREGATED_DATA_TABLE_NAME + ";";
@@ -217,9 +217,7 @@ public class AggregatedMonitoringDataSQLAccess {
             return monitoringSnapshots;
         }
     }
-    
-    
-    
+
     /**
      *
      * @param startIndex from which monitored entry ID to start extracting
@@ -228,20 +226,12 @@ public class AggregatedMonitoringDataSQLAccess {
      */
     public List<ServiceMonitoringSnapshot> extractMonitoringData() {
         Connection connection = getConnection();
-        PreparedStatement getMonitoringEntryPreparedStatement = null;
-        {
-            try {
-                String sql = "SELECT data from " + AGGREGATED_DATA_TABLE_NAME + ";";
-                getMonitoringEntryPreparedStatement = connection.prepareStatement(sql);
-            } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
-            }
-        }
 
+        String sql = "SELECT data from " + AGGREGATED_DATA_TABLE_NAME + ";";
 
         List<ServiceMonitoringSnapshot> monitoringSnapshots = new ArrayList<ServiceMonitoringSnapshot>();
         try {
-            ResultSet resultSet = getMonitoringEntryPreparedStatement.executeQuery();
+            ResultSet resultSet = connection.createStatement().executeQuery(sql);
             if (resultSet != null) {
 
                 while (resultSet.next()) {

@@ -475,7 +475,7 @@ public class SystemControl {
             return elSpaceJSON.toJSONString();
         }
 
-        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
+//        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
 
         //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
         LightweightEncounterRateElasticityPathway elasticityPathway = null;
@@ -498,7 +498,7 @@ public class SystemControl {
         }
 
         elasticityPathway.trainElasticityPathway(map);
-        tempSpace.reset();
+        
 
         List<Neuron> neurons = elasticityPathway.getSituationGroups();
         if (metrics == null) {
@@ -507,7 +507,7 @@ public class SystemControl {
             elSpaceJSON.put("name", "Service not found");
             return elSpaceJSON.toJSONString();
         } else {
-            return ConvertToJSON.convertElasticityPathway(metrics, neurons);
+            return ConvertToJSON.convertElasticityPathway(metrics, neurons);            
         }
     }
 
@@ -522,17 +522,16 @@ public class SystemControl {
             return elSpaceJSON.toJSONString();
         }
 
-        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
-
+//        int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
 
         //first, read from the sql of monitoring data, in increments of 10, and train the elasticity space function
-        List<Metric> metrics = null;
+//        List<Metric> metrics = null;
 
         List<ServiceMonitoringSnapshot> extractedData = aggregatedMonitoringDataSQLAccess.extractMonitoringData();
         if (extractedData != null) {
             //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
             for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
-                monitoringSnapshot.keepOnlyDataForElement(element);
+//                monitoringSnapshot.keepOnlyDataForElement(element);
                 elasticitySpaceFunction.trainElasticitySpace(monitoringSnapshot);
             }
         }
