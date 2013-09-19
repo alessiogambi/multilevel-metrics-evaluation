@@ -47,7 +47,7 @@ public class LocalGangliaLiveDataSource implements DataSourceI {
 
     public ClusterInfo getMonitoringData() throws DataAccessException {
 
-        String cmd = "telnet localhost " + Configuration.getGangliaPort();
+        String cmd = "telnet " + Configuration.getAccessMachineIP() + " " + Configuration.getGangliaPort();
         String content = "";
 
         try {
