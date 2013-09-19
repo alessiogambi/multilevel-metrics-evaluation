@@ -41,11 +41,16 @@ public class AggregatedMonitoringDataSQLAccess {
 
     private static final String AGGREGATED_DATA_TABLE_NAME = "AggregatedData";
     private Connection connection;
-    private PreparedStatement insertMonitoringEntryPreparedStatement; 
-    private PreparedStatement getMonitoringEntryPreparedStatement; 
-    private PreparedStatement getEntriesCountPreparedStatement; 
-    
+    private String username;
+    private String password;
+    private PreparedStatement insertMonitoringEntryPreparedStatement;
+    private PreparedStatement getMonitoringEntryPreparedStatement;
+    private PreparedStatement getEntriesCountPreparedStatement;
+
     public AggregatedMonitoringDataSQLAccess(String username, String password) {
+
+        this.username = username;
+        this.password = password;
 
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
@@ -57,7 +62,7 @@ public class AggregatedMonitoringDataSQLAccess {
         //BUSY wait used
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger().log(Level.ERROR, ex);
                 Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
@@ -99,7 +104,7 @@ public class AggregatedMonitoringDataSQLAccess {
                 Configuration.getLogger().log(Level.ERROR, ex);
             }
         }
-        
+
         {
             try {
                 String sql = "SELECT data from " + AGGREGATED_DATA_TABLE_NAME + " where "
@@ -109,7 +114,61 @@ public class AggregatedMonitoringDataSQLAccess {
                 Configuration.getLogger().log(Level.ERROR, ex);
             }
         }
-        
+
+        {
+            try {
+                String sql = "SELECT MAX(ID) from " + AGGREGATED_DATA_TABLE_NAME + ";";
+                getEntriesCountPreparedStatement = connection.prepareStatement(sql);
+            } catch (SQLException ex) {
+                Configuration.getLogger().log(Level.ERROR, ex);
+            }
+        }
+
+    }
+//    
+
+    private void reconnect() {
+
+        connection = null;
+
+        //if the SQL connection fails, try to reconnect, as the MELA_DataService might not be running.
+        //BUSY wait used
+        while (connection == null) {
+            try {
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
+            } catch (SQLException ex) {
+                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+            }
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+        }
+
+
+
+        {
+            try {
+                String sql = "INSERT INTO " + AGGREGATED_DATA_TABLE_NAME + " (data) "
+                        + "VALUES (?)";
+                insertMonitoringEntryPreparedStatement = connection.prepareStatement(sql);
+            } catch (SQLException ex) {
+                Configuration.getLogger().log(Level.ERROR, ex);
+            }
+        }
+
+        {
+            try {
+                String sql = "SELECT data from " + AGGREGATED_DATA_TABLE_NAME + " where "
+                        + "ID > (?) AND ID < (?);";
+                getMonitoringEntryPreparedStatement = connection.prepareStatement(sql);
+            } catch (SQLException ex) {
+                Configuration.getLogger().log(Level.ERROR, ex);
+            }
+        }
+
         {
             try {
                 String sql = "SELECT MAX(ID) from " + AGGREGATED_DATA_TABLE_NAME + ";";
@@ -128,9 +187,10 @@ public class AggregatedMonitoringDataSQLAccess {
             insertMonitoringEntryPreparedStatement.executeUpdate();
         } catch (SQLException ex) {
             Configuration.getLogger().log(Level.ERROR, ex);
+            reconnect();
         }
     }
-    
+
     //gets the maximum ID encountered
     public int getRecordsCount() {
         try {
@@ -144,16 +204,17 @@ public class AggregatedMonitoringDataSQLAccess {
 
         } catch (SQLException ex) {
             Configuration.getLogger().log(Level.ERROR, ex);
-             return 0;
-        }  
+            reconnect();
+            return 0;
+        }
     }
-    
-   /**
-    * 
-    * @param startIndex from which monitored entry ID to start extracting
-    * @param count max number of elements to return
-    * @return returns maximum count elements
-    */ 
+
+    /**
+     *
+     * @param startIndex from which monitored entry ID to start extracting
+     * @param count max number of elements to return
+     * @return returns maximum count elements
+     */
     public List<ServiceMonitoringSnapshot> extractMonitoringData(int startIndex, int count) {
         List<ServiceMonitoringSnapshot> monitoringSnapshots = new ArrayList<ServiceMonitoringSnapshot>();
         try {
@@ -170,11 +231,12 @@ public class AggregatedMonitoringDataSQLAccess {
 
         } catch (SQLException ex) {
             Configuration.getLogger().log(Level.ERROR, ex);
+            reconnect();
         } finally {
             return monitoringSnapshots;
         }
     }
-    
+
 //   
 //        
 //        
@@ -201,7 +263,6 @@ public class AggregatedMonitoringDataSQLAccess {
 //        }
 //
 //    }
-
     public void closeConnection() throws SQLException {
         connection.close();
     }
