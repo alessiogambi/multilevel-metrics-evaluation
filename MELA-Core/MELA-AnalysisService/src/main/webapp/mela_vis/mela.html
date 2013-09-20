@@ -41,8 +41,9 @@
             var metricsSource = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/metriccompositionrules";
             var elSpaceHTMLURL = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/mela_vis/elasticitySpaceAndPathway.html?";
 
-            setInterval(function () {
-                
+            setTimeout(refreshPage, 5000);
+            
+            function refreshPage(){
                 d3.json(metricsSource, function (metricsJSON) {
                     metrics = metricsJSON;
                 });
@@ -73,8 +74,8 @@
                 }else{
                     highlightMetricsSourcesOneLevel(selectedMetric); 
                 }
-                
-            }, 5000);
+                setTimeout(refreshPage, 5000);
+            }
 
             function contains(children, child) {
                 for (var index = 0; index < children.length; index++) {

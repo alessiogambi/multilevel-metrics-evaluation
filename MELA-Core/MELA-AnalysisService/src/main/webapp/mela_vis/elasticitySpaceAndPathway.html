@@ -420,11 +420,11 @@
         
         document.title = vars[0]+ ": Elasticity Analysis";
         
-        setInterval(function () {
+        setTimeout(function () {
             
             drawElSpaceAndPathway(vars);
         
-        }, 3000);
+        }, 5000);
             
         function drawElSpaceAndPathway(vars){   
             
@@ -455,15 +455,10 @@
                 .attr("y2", 0)
                 .attr("stroke-width", 1)
                 .attr("stroke", "black");
-                
-               
-                
-            
-             
+                 
                 generateElSpaceChart(elSpace, elSpaceSVG, lineThickness, elSpaceColors, -50, 50, width, height, "Time (s)");
            
-           
-
+            
             });
         
             //get elasticity pathway
@@ -500,8 +495,13 @@
                 }
                 
                 generateElPathwayChart(elPthw, elPthwSVG, elPathwayColors, 0,70 , elSgnChartWidth, height,"Situations Encounter Rate (%)", "Value");
-                
+                setTimeout(function () {
+            
+                    drawElSpaceAndPathway(vars);
+        
+                }, 5000);
             });
+           
         }
         
         drawElSpaceAndPathway(vars);
