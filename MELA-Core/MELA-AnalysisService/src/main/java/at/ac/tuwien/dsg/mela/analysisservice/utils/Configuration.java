@@ -30,7 +30,7 @@ import org.apache.log4j.PropertyConfigurator;
  * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at
  *
  * Class which acts as entry point towards all configuration options that need
- * to be added to the MELA-AnalysisService 
+ * to be added to the MELA-AnalysisService
  *
  */
 public class Configuration {
@@ -76,6 +76,22 @@ public class Configuration {
             return Boolean.parseBoolean(configuration.getProperty("ELASTICITY_ANALYSIS_ENABLED").toLowerCase());
         } else {
             return true; //default
+        }
+    }
+
+    public static int getDataServicePort() {
+        if (configuration.containsKey("MELA_DATA_SERVICE_PORT")) {
+            return Integer.parseInt(configuration.getProperty("MELA_DATA_SERVICE_PORT"));
+        } else {
+            return 9123; //default 2 frames
+        }
+    }
+
+    public static String getDataServiceIP() {
+        if (configuration.containsKey("MELA_DATA_SERVICE_IP")) {
+            return configuration.getProperty("MELA_DATA_SERVICE_IP");
+        } else {
+            return "localhost";
         }
     }
 }

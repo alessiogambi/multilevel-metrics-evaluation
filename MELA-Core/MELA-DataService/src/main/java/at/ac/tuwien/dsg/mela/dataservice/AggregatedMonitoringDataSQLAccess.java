@@ -91,7 +91,7 @@ public class AggregatedMonitoringDataSQLAccess {
         //BUSY wait used
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://localhost:" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger().log(Level.ERROR, ex);
                 Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
