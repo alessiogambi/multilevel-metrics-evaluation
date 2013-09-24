@@ -35,6 +35,7 @@ public class MELADataService {
         server.setDatabaseName(0, "MonitoringDataDB");
         server.setDatabasePath(0, "file:./monitoring/monitoringDB;user=mela;password=mela");
         server.setPort(Configuration.getDataServicePort());
+        server.setAddress(Configuration.getDataServiceIP());
         
         //username and password : mela mela
         //TODO: add databases for el pathway and space and service types
