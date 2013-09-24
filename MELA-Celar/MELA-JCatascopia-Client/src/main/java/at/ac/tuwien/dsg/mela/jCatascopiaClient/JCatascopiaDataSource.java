@@ -20,6 +20,7 @@
 package at.ac.tuwien.dsg.mela.jCatascopiaClient;
 
 import at.ac.tuwien.dsg.mela.common.exceptions.DataAccessException;
+import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MetricValue;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.dataAccess.DataSourceI;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.ClusterInfo;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.HostInfo;
@@ -99,6 +100,9 @@ public class JCatascopiaDataSource implements DataSourceI {
                    info.setUnits(metric.getUnit());
                    info.setValue(metric.getValue());
                    info.setSource(metric.getGroup());
+                   Object o = info.getConvertedValue();
+                   MetricValue metricValue = new MetricValue(o);
+                   String meString = metricValue.getValueRepresentation();
                    
                    //add the metric tot he hosts info
                    hostInfo.getMetrics().add(info);
@@ -320,7 +324,7 @@ public class JCatascopiaDataSource implements DataSourceI {
                     
                     //get agent group
                     if (metric.has("group")) {
-                        jCatascopiaMetric.setType(metric.getString("group"));
+                        jCatascopiaMetric.setGroup(metric.getString("group"));
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia group not found in {0}", availableMetrics);
                     }
