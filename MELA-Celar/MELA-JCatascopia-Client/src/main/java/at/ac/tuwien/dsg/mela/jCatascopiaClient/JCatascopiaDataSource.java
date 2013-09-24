@@ -376,7 +376,7 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
             
             //cut the last ","
-            getMetricsInfoQuerry = getMetricsInfoQuerry.substring(0,getMetricsInfoQuerry.length());
+            getMetricsInfoQuerry = getMetricsInfoQuerry.substring(0,getMetricsInfoQuerry.lastIndexOf(","));
             
             bufferedWriter.write(getMetricsInfoQuerry);
             bufferedWriter.flush();
@@ -427,9 +427,9 @@ public class JCatascopiaDataSource implements DataSourceI {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia metricID not found in {0}", availableMetrics);
                     }
 
-                    //get agent name
-                    if (metric.has("name")) {
-                        metricValue = metric.getString("name");
+                    //get metric value
+                    if (metric.has("value")) {
+                        metricValue = metric.getString("value");
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia name not found in {0}", availableMetrics);
                     }
