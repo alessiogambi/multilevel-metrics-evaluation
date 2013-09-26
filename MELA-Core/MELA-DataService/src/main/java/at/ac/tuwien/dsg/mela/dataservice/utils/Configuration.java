@@ -72,9 +72,9 @@ public class Configuration {
             }
 
 
-            //tie System.out and System.err to this logger
-            System.setOut(createOutLoggingProxy(System.out, logger));
-            System.setErr(createErrLoggingProxy(System.err, logger));
+//            //tie System.out and System.err to this logger
+//            System.setOut(createOutLoggingProxy(System.out, logger));
+//            System.setErr(createErrLoggingProxy(System.err, logger));
 
 
         } catch (Exception ex) {
@@ -83,22 +83,22 @@ public class Configuration {
         }
 
     }
-
-    private static PrintStream createOutLoggingProxy(final PrintStream realPrintStream, final Logger l) {
-        return new PrintStream(realPrintStream) {
-            public void print(final String string) {
-                l.info(string);
-            }
-        };
-    }
-
-    private static PrintStream createErrLoggingProxy(final PrintStream realPrintStream, final Logger l) {
-        return new PrintStream(realPrintStream) {
-            public void print(final String string) {
-                l.info(string);
-            }
-        };
-    }
+//
+//    private static PrintStream createOutLoggingProxy(final PrintStream realPrintStream, final Logger l) {
+//        return new PrintStream(realPrintStream) {
+//            public void print(final String string) {
+//                l.info(string);
+//            }
+//        };
+//    }
+//
+//    private static PrintStream createErrLoggingProxy(final PrintStream realPrintStream, final Logger l) {
+//        return new PrintStream(realPrintStream) {
+//            public void print(final String string) {
+//                l.info(string);
+//            }
+//        };
+//    }
 
     public static String getSecurityCertificatePath() {
         return configuration.getProperty("PEM_CERT_PATH");
