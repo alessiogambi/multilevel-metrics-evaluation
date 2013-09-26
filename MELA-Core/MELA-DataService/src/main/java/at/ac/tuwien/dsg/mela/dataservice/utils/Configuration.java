@@ -148,4 +148,13 @@ public class Configuration {
             return "localhost";
         }
     }
+    
+    
+    public static String getJCatascopiaIP() {
+        if (configuration.containsKey("JCATASCOPIA_IP")) {
+            return configuration.getProperty("JCATASCOPIA_IP");
+        } else {
+            return "localhost";
+        }
+    }
 }

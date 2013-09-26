@@ -43,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import util.Configuration;
 
 /**
  * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at *
@@ -50,7 +51,7 @@ import org.json.JSONObject;
  */
 public class JCatascopiaDataSource implements DataSourceI {
 
-    private static final String JCATASCOPIA_REST_API_URL = "http://83.212.112.35/jcatascopia/restAPI";
+    private static final String JCATASCOPIA_REST_API_URL = "http://"+Configuration.getJCatascopiaIP()+"/jcatascopia/restAPI";
     private static List<JCatascopiaAgent> poolOfAgents;
     
     static{
