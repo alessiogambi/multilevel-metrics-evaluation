@@ -18,14 +18,11 @@
   </description>
 
   <packaging>pom</packaging>
-
-
-    
-  <modules>
+   
+   <modules>
         <module>MELA-Core</module>
         <module>MELA-Celar</module>
     </modules>
-
 
   <organization>
     <name>CELAR</name>
@@ -49,7 +46,7 @@
 
   <repositories>
 
-    <repository>
+<!--    <repository>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -61,42 +58,42 @@
       <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/releases</url>
     </repository>
 
-    <repository>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>POMSnapshots</id>
-      <name>POM Snapshots</name>
-      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
-    </repository>
+        <repository>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+          <id>POMSnapshots</id>
+          <name>POM Snapshots</name>
+          <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
+        </repository>-->
 
-  </repositories>
+    </repositories>
 
- <dependencyManagement>
-    <dependencies>
-    <!--  Add CELAR dependencies here. -->
-    </dependencies>
-  </dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
+            <!--  Add CELAR dependencies here. -->
+        </dependencies>
+    </dependencyManagement>
 
-  <distributionManagement>
+    <distributionManagement>
 
-    <repository>
-      <id>celar.releases</id>
-      <name>Releases</name>
-      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/releases</url>
-    </repository>
+        <repository>
+            <id>celar.releases</id>
+            <name>Releases</name>
+            <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/releases</url>
+        </repository>
 
-    <snapshotRepository>
-      <id>celar.snapshots</id>
-      <name>Snapshots</name>
-      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
-    </snapshotRepository>
+        <snapshotRepository>
+            <id>celar.snapshots</id>
+            <name>Snapshots</name>
+            <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
 
-  </distributionManagement>
+    </distributionManagement>
 
-<!-- up to here into celar-discribution POM.  -->
+    <!-- up to here into celar-discribution POM.  -->
 
 </project>
