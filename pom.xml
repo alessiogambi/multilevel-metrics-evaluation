@@ -7,10 +7,6 @@
   <version>0.1-SNAPSHOT</version>
   <name>MELA</name>
 
-  <prerequisites>
-    <maven>2.0.6</maven>
-  </prerequisites>
-
   <url>https://github.com/CELAR/multilevel-metrics-evaluation</url>
 
   <description>
@@ -43,34 +39,6 @@
     <connection>scm:git:ssh://git@github.com:CELAR/multilevel-metrics-evaluation.git</connection>
     <developerConnection>scm:git:ssh://git@github.com:CELAR/multilevel-metrics-evaluation.git</developerConnection>
   </scm>
-
-  <repositories>
-
-<!--    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>POMReleases</id>
-      <name>POM Releases</name>
-      <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/releases</url>
-    </repository>
-
-        <repository>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-          <id>POMSnapshots</id>
-          <name>POM Snapshots</name>
-          <url>https://vm091.grnet.stratuslab.eu/nexus/content/repositories/snapshots</url>
-        </repository>-->
-
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
