@@ -33,7 +33,7 @@ public class DummyDataSource implements DataSourceI{
 
     public ClusterInfo getMonitoringData() throws DataAccessException {
         ClusterInfo clusterInfo = new ClusterInfo();
-        Configuration.getLogger().log(Priority.INFO, "Using DUMMY Data Source");
+        Configuration.getLogger(this.getClass()).log(Priority.INFO, "Using DUMMY Data Source");
         return clusterInfo;
     }
 

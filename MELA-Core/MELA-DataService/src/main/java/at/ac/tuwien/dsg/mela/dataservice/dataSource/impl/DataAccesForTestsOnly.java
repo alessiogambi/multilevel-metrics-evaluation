@@ -70,14 +70,14 @@ public class DataAccesForTestsOnly extends AbstractDataAccess {
             DataSourceI dataSource = new RemoteGangliaLiveDataSource();
             return new DataAccesForTestsOnly(dataSource);
         } else if (accessType.equalsIgnoreCase("JCatascopia")) {
-            Configuration.getLogger().log(Priority.ERROR, "JCatascopia adapter not yet implemented. Using dummy.");
+            Configuration.getLogger(DataAccesForTestsOnly.class).log(Priority.ERROR, "JCatascopia adapter not yet implemented. Using dummy.");
             return new DataAccesForTestsOnly(new DummyDataSource());
         } else if (accessType.equalsIgnoreCase("Replay")) {
             String monitoringSeqID = Configuration.getStoredMonitoringSequenceID();
             DataSourceI dataSourceI = new GangliaSQLDataSource(monitoringSeqID, "mela", "mela");
             return new DataAccesForTestsOnly(dataSourceI);
         } else {
-            Configuration.getLogger().log(Priority.ERROR, "MELA-DataService data access mode not specified or not recognized");
+            Configuration.getLogger(DataAccesForTestsOnly.class).log(Priority.ERROR, "MELA-DataService data access mode not specified or not recognized");
             return new DataAccesForTestsOnly(new DummyDataSource());
         }
     }
@@ -96,7 +96,7 @@ public class DataAccesForTestsOnly extends AbstractDataAccess {
     public synchronized ServiceMonitoringSnapshot getMonitoredData(MonitoredElement m) {
 
         if (m == null) {
-            Configuration.getLogger().log(Level.WARN, "No supplied service configuration");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "No supplied service configuration");
             return new ServiceMonitoringSnapshot();
         }
         MonitoredElement structureRoot = m.clone();
@@ -110,8 +110,8 @@ public class DataAccesForTestsOnly extends AbstractDataAccess {
                 return new ServiceMonitoringSnapshot();
             }
         } catch (DataAccessException e) {
-            Configuration.getLogger().log(Level.ERROR, e.getMessage(), e);
-            Configuration.getLogger().log(Level.ERROR, "Terminating execution");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, e.getMessage(), e);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Terminating execution");
             System.exit(1);
         }
 
@@ -205,8 +205,8 @@ public class DataAccesForTestsOnly extends AbstractDataAccess {
                 return new MonitoredElementMonitoringSnapshot();
             }
         } catch (DataAccessException e) {
-            Configuration.getLogger().log(Level.ERROR, e.getMessage(), e);
-            Configuration.getLogger().log(Level.ERROR, "Terminating execution");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, e.getMessage(), e);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Terminating execution");
             System.exit(1);
         }
 
@@ -259,8 +259,8 @@ public class DataAccesForTestsOnly extends AbstractDataAccess {
                 return new ArrayList<Metric>();
             }
         } catch (DataAccessException e) {
-            Configuration.getLogger().log(Level.ERROR, e.getMessage(), e);
-            Configuration.getLogger().log(Level.ERROR, "Terminating execution");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, e.getMessage(), e);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Terminating execution");
             System.exit(1);
         }
 

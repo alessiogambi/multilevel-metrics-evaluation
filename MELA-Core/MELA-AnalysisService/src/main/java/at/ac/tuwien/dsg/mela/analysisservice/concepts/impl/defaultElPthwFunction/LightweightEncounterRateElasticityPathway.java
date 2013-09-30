@@ -90,7 +90,7 @@ public class LightweightEncounterRateElasticityPathway {
         //classify all monitoring data
         //need to go trough all monitoring data, and push the classified items, such that I respect the monitored sequence.
         if (dataToClassify == null || dataToClassify.values().isEmpty()) {
-            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity pathway");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Empty data to classify as elasticity pathway");
             return;
         }
         int maxIndex = dataToClassify.values().iterator().next().size();
@@ -102,7 +102,7 @@ public class LightweightEncounterRateElasticityPathway {
 
                 //maybe we have diff value count for different metrics. Not sure when his might happen though.
                 if (values.size() <= i) {
-                    Configuration.getLogger().log(Level.ERROR, "Less values for metric " + mapped);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Less values for metric " + mapped);
                     break;
                 }
 
@@ -124,10 +124,10 @@ public class LightweightEncounterRateElasticityPathway {
                     try {
                         values.add(Double.parseDouble(value.getValueRepresentation()));
                     } catch (Exception e) {
-                        Configuration.getLogger().log(Level.ERROR, e);
+                        Configuration.getLogger(this.getClass()).log(Level.ERROR, e);
                     }
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             som.updateMap(new Neuron(values));
@@ -147,7 +147,7 @@ public class LightweightEncounterRateElasticityPathway {
                     Number nr = (Number) value.getValue();
                     values.add(nr.doubleValue());
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.classifySituation(new Neuron(values));

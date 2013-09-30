@@ -131,7 +131,7 @@ public class SystemControl {
         if (actionsInExecution.containsKey(element)) {
             actionsInExecution.remove(element);
         } else {
-            Configuration.getLogger().log(Level.INFO, "Action " + actionName + " on monitored element " + targetEntityID + " not found.");
+            Configuration.getLogger(this.getClass()).log(Level.INFO, "Action " + actionName + " on monitored element " + targetEntityID + " not found.");
         }
     }
 
@@ -218,7 +218,7 @@ public class SystemControl {
             }
             this.compositionRulesConfiguration = compositionRulesConfiguration;
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl."
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl."
                     + "Metric filters to get metrics targeted by composition rules will not be added");
             this.compositionRulesConfiguration = compositionRulesConfiguration;
         }
@@ -237,7 +237,7 @@ public class SystemControl {
         if (dataAccess != null) {
             return dataAccess.getMonitoredData(serviceConfiguration);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
             return new ServiceMonitoringSnapshot();
         }
     }
@@ -254,7 +254,7 @@ public class SystemControl {
         if (dataAccess != null) {
             return instantMonitoringDataEnrichmentEngine.enrichMonitoringData(compositionRulesConfiguration, rawMonitoringData);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
             return new ServiceMonitoringSnapshot();
         }
     }
@@ -263,7 +263,7 @@ public class SystemControl {
         if (dataAccess != null) {
             return instantMonitoringDataAnalysisEngine.analyzeRequirements(instantMonitoringDataEnrichmentEngine.enrichMonitoringData(compositionRulesConfiguration, rawMonitoringData), requirements);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
             return new AnalysisReport(new ServiceMonitoringSnapshot(), new Requirements());
         }
     }
@@ -272,7 +272,7 @@ public class SystemControl {
         if (dataAccess != null) {
             return instantMonitoringDataAnalysisEngine.analyzeRequirements(instantMonitoringDataEnrichmentEngine.enrichMonitoringData(compositionRulesConfiguration, latestMonitoringData), requirements);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
             return new AnalysisReport(new ServiceMonitoringSnapshot(), new Requirements());
         }
     }
@@ -281,7 +281,7 @@ public class SystemControl {
         if (dataAccess != null) {
             return dataAccess.getAvailableMetricsForMonitoredElement(MonitoredElement);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
             return new ArrayList<Metric>();
         }
     }
@@ -290,7 +290,7 @@ public class SystemControl {
         if (dataAccess != null) {
             dataAccess.addMetricFilter(metricFilter);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
         }
     }
 
@@ -298,7 +298,7 @@ public class SystemControl {
         if (dataAccess != null) {
             dataAccess.addMetricFilters(newFilters);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
         }
     }
 
@@ -306,7 +306,7 @@ public class SystemControl {
         if (dataAccess != null) {
             dataAccess.removeMetricFilter(metricFilter);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
         }
     }
 
@@ -314,7 +314,7 @@ public class SystemControl {
         if (dataAccess != null) {
             dataAccess.removeMetricFilters(filtersToRemove);
         } else {
-            Configuration.getLogger().log(Level.WARN, "Data Access source not set yet on SystemControl");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Data Access source not set yet on SystemControl");
         }
     }
 
@@ -357,15 +357,15 @@ public class SystemControl {
                     } else {
                         //stop the monitoring if the data replay is done
 //                        this.cancel();
-                        Configuration.getLogger().log(Level.ERROR, "Monitoring data is NULL");
+                        Configuration.getLogger(this.getClass()).log(Level.ERROR, "Monitoring data is NULL");
                     }
                 } else {
-                    Configuration.getLogger().log(Level.WARN, "No service configuration");
+                    Configuration.getLogger(this.getClass()).log(Level.WARN, "No service configuration");
                 }
             }
         };
         //repeat the monitoring every monitoringIntervalInSeconds seconds 
-        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 500);
+        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
 //        monitoringTimer.schedule(task, 0,1);
     }
 
@@ -378,7 +378,7 @@ public class SystemControl {
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
         if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
-            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElPathway");
             return elSpaceJSON.toJSONString();
@@ -415,7 +415,7 @@ public class SystemControl {
 
         List<Neuron> neurons = elasticityPathway.getSituationGroups();
         if (metrics == null) {
-            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "Service not found");
             return elSpaceJSON.toJSONString();
@@ -430,7 +430,7 @@ public class SystemControl {
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
         if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
-            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElSpace");
             return elSpaceJSON.toJSONString();
@@ -469,7 +469,7 @@ public class SystemControl {
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
         if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
-            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElPathway");
             return elSpaceJSON.toJSONString();
@@ -502,7 +502,7 @@ public class SystemControl {
 
         List<Neuron> neurons = elasticityPathway.getSituationGroups();
         if (metrics == null) {
-            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "Service not found");
             return elSpaceJSON.toJSONString();
@@ -516,7 +516,7 @@ public class SystemControl {
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
         if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
-            Configuration.getLogger().log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Elasticity analysis disabled, or no service configuration or composition rules configuration");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElSpace");
             return elSpaceJSON.toJSONString();

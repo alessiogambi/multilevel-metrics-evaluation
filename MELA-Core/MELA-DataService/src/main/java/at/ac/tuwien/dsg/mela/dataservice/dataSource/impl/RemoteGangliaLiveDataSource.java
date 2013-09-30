@@ -147,7 +147,7 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
             while ((line = reader.readLine()) != null) {
                 //if ganglia does not respond
                 if (line.contains("Unable to connect")) {
-                    Configuration.getLogger().log(Level.WARN, "" + rootIPAddress + " does not respond to monitoring request");
+                    Configuration.getLogger(this.getClass()).log(Level.WARN, "" + rootIPAddress + " does not respond to monitoring request");
                     return null;
                 }
                 if (line.contains("<") || line.endsWith("]>")) {
@@ -199,7 +199,7 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
 //
 //            //if ganglia does not respond
 //            if (line.contains("Unable to connect")) {
-//                Configuration.getLogger().log(Level.WARN, "Unable to execute " + cmd);
+//                Configuration.getLogger(this.getClass()).log(Level.WARN, "Unable to execute " + cmd);
 //                return null;
 //            }
 //            if (line.contains("<") || line.endsWith("]>")) {
@@ -214,7 +214,7 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
 //
 //        //if ganglia does not respond
 //        if (content == null || content.length() == 0) {
-//            Configuration.getLogger().log(Level.WARN, "" + "Unable to execute " + cmd);
+//            Configuration.getLogger(this.getClass()).log(Level.WARN, "" + "Unable to execute " + cmd);
 //            return null;
 //        }
 //
@@ -231,14 +231,14 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
             return gangliaClusterInfo;
         } catch (Exception e) {
             session = null;
-            Configuration.getLogger().log(Level.WARN, e.getMessage());
+            Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage());
             return new ClusterInfo();
 
         }
     }
 
 //    private void saveRawDataToFile(String file, GangliaClusterInfo gangliaClusterInfo) {
-////        Configuration.getLogger().log(Level.INFO,"Collected monitoring data at " + new Date());
+////        Configuration.getLogger(this.getClass()).log(Level.INFO,"Collected monitoring data at " + new Date());
 //        try {
 //            String elasticity = yaml.dump(gangliaClusterInfo);
 //            //better to open close buffers as there are less chances I get the file in unstable state if I terminate the
@@ -249,7 +249,7 @@ public class RemoteGangliaLiveDataSource implements DataSourceI {
 //            bufferedWriter.flush();
 //            bufferedWriter.close();
 //        } catch (Exception e) {
-//            Configuration.getLogger().log(Level.WARN, e.getMessage(), e);
+//            Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage(), e);
 //            e.printStackTrace();
 //        }
 //    }

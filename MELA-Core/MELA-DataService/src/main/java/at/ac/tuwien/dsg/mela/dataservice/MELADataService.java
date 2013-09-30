@@ -44,7 +44,7 @@ public class MELADataService {
     
     public void startServer(){
         server.start();
-        Configuration.getLogger().log(Level.INFO, "SQL Server started");
+        Configuration.getLogger(this.getClass()).log(Level.INFO, "SQL Server started");
     }
     
     public void stopServer(){

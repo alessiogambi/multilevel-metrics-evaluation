@@ -56,7 +56,7 @@ public class GangliaSQLDataSource implements DataSourceI {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
         } catch (Exception ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
 
         //if the SQL connection fails, try to reconnect, as the MELA_DataService might not be running.
@@ -65,13 +65,13 @@ public class GangliaSQLDataSource implements DataSourceI {
             try {
                 connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
-                Configuration.getLogger().log(Level.WARN, "Could not connect to sql data end. Retrying in 1 second");
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not connect to sql data end. Retrying in 1 second");
             }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             }
         }
 
@@ -82,7 +82,7 @@ public class GangliaSQLDataSource implements DataSourceI {
             ResultSet getMinTimestampID = statement.executeQuery("select MIN(id) from Timestamp where monseqid = (SELECT ID FROM MONITORINGSEQ where TIMESTAMP='" + monSeqID + "')");
 
             if (!getMinTimestampID.next()) {
-                Configuration.getLogger().log(Level.ERROR, "Could not find monitored timestamps for monitoring sequence ID " + monSeqID);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, "Could not find monitored timestamps for monitoring sequence ID " + monSeqID);
                 statement.close();
                 return;
             }
@@ -90,8 +90,8 @@ public class GangliaSQLDataSource implements DataSourceI {
             currentTimestampID = getMinTimestampID.getString(1);
             statement.close();
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
-            Configuration.getLogger().log(Level.WARN, "Could not get timestampID from the SQL Data End");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not get timestampID from the SQL Data End");
         }
         
     }
@@ -103,7 +103,7 @@ public class GangliaSQLDataSource implements DataSourceI {
         try {
             statement = connection.createStatement();
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             throw new DataAccessException(ex.getMessage(), ex.getCause());
         }
 
@@ -113,14 +113,14 @@ public class GangliaSQLDataSource implements DataSourceI {
             getMinTimestampID = statement.executeQuery("select MIN(ID) from Timestamp where monseqid = (SELECT ID FROM MONITORINGSEQ where TIMESTAMP='" + monSeqID + "') AND id > " + currentTimestampID);
 
             if (!getMinTimestampID.next()) {
-                Configuration.getLogger().log(Level.ERROR, "Could not find monitored timestamps for monitoring sequence ID " + monSeqID);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, "Could not find monitored timestamps for monitoring sequence ID " + monSeqID);
                 statement.close();
                 return null;
             }
             //register next monitoring snapshot
             currentTimestampID = getMinTimestampID.getString(1);
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             throw new DataAccessException(ex.getMessage(), ex.getCause());
         }
 
@@ -164,7 +164,7 @@ public class GangliaSQLDataSource implements DataSourceI {
 
 
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             throw new DataAccessException(ex.getMessage(), ex.getCause());
         }
         return clusterInfo;

@@ -50,7 +50,7 @@ public class InMemoryEncounterRateElasticityPathway {
         //classify all monitoring data
         //need to go trough all monitoring data, and push the classified items, such that I respect the monitored sequence.
         if (dataToClassify.values().isEmpty()) {
-            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity pathway");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Empty data to classify as elasticity pathway");
             return null;
         }
         int maxIndex = dataToClassify.values().iterator().next().size();
@@ -62,7 +62,7 @@ public class InMemoryEncounterRateElasticityPathway {
 
                 //maybe we have diff value count for different metrics. Not sure when his might happen though.
                 if (values.size() <= i) {
-                    Configuration.getLogger().log(Level.ERROR, "Less values for metric " + mapped);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Less values for metric " + mapped);
                     break;
                 }
 
@@ -83,7 +83,7 @@ public class InMemoryEncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.updateMap(new Neuron(values));
@@ -106,7 +106,7 @@ public class InMemoryEncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can;t be applied on non-numeric metric value " + value);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Elasticity Pathway can;t be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.classifySituation(new Neuron(values));
@@ -154,7 +154,7 @@ public class InMemoryEncounterRateElasticityPathway {
         //classify all monitoring data
         //need to go trough all monitoring data, and push the classified items, such that I respect the monitored sequence.
         if (dataToClassify.values().size() == 0) {
-            Configuration.getLogger().log(Level.ERROR, "Empty data to classify as elasticity pathway");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Empty data to classify as elasticity pathway");
             return null;
         }
         int maxIndex = dataToClassify.values().iterator().next().size();
@@ -166,7 +166,7 @@ public class InMemoryEncounterRateElasticityPathway {
 
                 //maybe we have diff value count for different metrics. Not sure when his might happen though.
                 if (values.size() <= i) {
-                    Configuration.getLogger().log(Level.ERROR, "Less values for metric " + mapped);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Less values for metric " + mapped);
                     break;
                 }
 
@@ -187,7 +187,7 @@ public class InMemoryEncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Elasticity Pathway can't be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.updateMap(new Neuron(values));
@@ -210,7 +210,7 @@ public class InMemoryEncounterRateElasticityPathway {
                 if (value.getValueType() == MetricValue.ValueType.NUMERIC) {
                     values.add(Double.parseDouble(value.getValueRepresentation()));
                 } else {
-                    Configuration.getLogger().log(Level.ERROR, "Elasticity Pathway can;t be applied on non-numeric metric value " + value);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, "Elasticity Pathway can;t be applied on non-numeric metric value " + value);
                 }
             }
             Neuron neuron = som.classifySituation(new Neuron(values));

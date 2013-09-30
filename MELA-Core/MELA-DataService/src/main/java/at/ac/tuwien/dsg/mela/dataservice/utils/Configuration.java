@@ -116,8 +116,8 @@ public class Configuration {
         return configuration.getProperty("SERVICE_ELEMENT_ID_METRIC_NAME");
     }
 
-    public static Logger getLogger() {
-        return logger;
+    public static Logger getLogger(Class loggerClass) {
+        return Logger.getLogger(loggerClass);
     }
 
     public static String getAccessUserName() {

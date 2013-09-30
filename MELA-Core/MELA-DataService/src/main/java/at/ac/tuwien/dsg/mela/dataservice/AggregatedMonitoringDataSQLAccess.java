@@ -54,7 +54,7 @@ public class AggregatedMonitoringDataSQLAccess {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
         } catch (Exception ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
 
         Connection connection = getConnection();
@@ -65,7 +65,7 @@ public class AggregatedMonitoringDataSQLAccess {
                 deleteTableIfExisting = connection.createStatement();
                 deleteTableIfExisting.executeQuery("DROP TABLE " + AGGREGATED_DATA_TABLE_NAME + " IF EXISTS");
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             }
         }
 
@@ -76,7 +76,7 @@ public class AggregatedMonitoringDataSQLAccess {
                 createTable = connection.createStatement();
                 createTable.executeQuery("create table " + AGGREGATED_DATA_TABLE_NAME + " (ID int IDENTITY, data OTHER);");
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             }
         }
 
@@ -93,8 +93,8 @@ public class AggregatedMonitoringDataSQLAccess {
             try {
                 connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
-                Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
             }
             try {
                 Thread.sleep(5000);
@@ -116,7 +116,7 @@ public class AggregatedMonitoringDataSQLAccess {
                         + "VALUES (?)";
                 insertMonitoringEntryPreparedStatement = connection.prepareStatement(sql);
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
                 return;
             }
         }
@@ -126,7 +126,7 @@ public class AggregatedMonitoringDataSQLAccess {
             insertMonitoringEntryPreparedStatement.setObject(1, monitoringSnapshot);
             insertMonitoringEntryPreparedStatement.executeUpdate();
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         } finally {
             try {
                 connection.commit();
@@ -146,7 +146,7 @@ public class AggregatedMonitoringDataSQLAccess {
                 String sql = "SELECT MAX(ID) from " + AGGREGATED_DATA_TABLE_NAME + ";";
                 getEntriesCountPreparedStatement = connection.prepareStatement(sql);
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
                 return 0;
             }
         }
@@ -161,7 +161,7 @@ public class AggregatedMonitoringDataSQLAccess {
             }
 
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
 
             return 0;
         } finally {
@@ -188,7 +188,7 @@ public class AggregatedMonitoringDataSQLAccess {
                         + "ID > (?) AND ID < (?);";
                 getMonitoringEntryPreparedStatement = connection.prepareStatement(sql);
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             }
         }
 
@@ -207,7 +207,7 @@ public class AggregatedMonitoringDataSQLAccess {
             }
 
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         } finally {
             try {
                 connection.close();
@@ -241,7 +241,7 @@ public class AggregatedMonitoringDataSQLAccess {
             }
 
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         } finally {
             try {
                 connection.close();

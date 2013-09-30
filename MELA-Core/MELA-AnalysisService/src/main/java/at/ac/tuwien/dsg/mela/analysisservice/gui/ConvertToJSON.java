@@ -54,7 +54,7 @@ public class ConvertToJSON {
 
     public static String convertElasticityPathway(List<Metric> metrics, List<Neuron> elPathwayGroups) {
         if (elPathwayGroups == null || metrics == null) {
-            Configuration.getLogger().log(Level.WARN, "Elasticity Pathway is null");
+            Configuration.getLogger(ConvertToJSON.class).log(Level.WARN, "Elasticity Pathway is null");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElPathway");
             return elSpaceJSON.toJSONString();
@@ -99,7 +99,7 @@ public class ConvertToJSON {
     public static String convertElasticitySpace(ElasticitySpace space, MonitoredElement MonitoredElement) {
 
         if (space == null || MonitoredElement == null) {
-            Configuration.getLogger().log(Level.WARN, "Elasticity Space or supplied Service Element are null");
+            Configuration.getLogger(ConvertToJSON.class).log(Level.WARN, "Elasticity Space or supplied Service Element are null");
             JSONObject elSpaceJSON = new JSONObject();
             elSpaceJSON.put("name", "ElSpace");
             return elSpaceJSON.toJSONString();

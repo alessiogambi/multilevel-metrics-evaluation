@@ -44,7 +44,7 @@ public class MonDataSQLWriteAccess {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
         } catch (Exception ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
 
         //if the SQL connection fails, try to reconnect, as the MELA_DataService might not be running.
@@ -53,8 +53,8 @@ public class MonDataSQLWriteAccess {
             try {
                 connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
-                Configuration.getLogger().log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
             }
             try {
                 Thread.sleep(1000);
@@ -73,7 +73,7 @@ public class MonDataSQLWriteAccess {
                 addSeqStmt.executeUpdate("insert into MonitoringSeq (timestamp) VALUES (" + firstMonitoringSequenceTimestamp + ")");
                 addSeqStmt.close();
             } catch (SQLException ex) {
-                Configuration.getLogger().log(Level.ERROR, ex);
+                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             }
         }
 
@@ -81,7 +81,7 @@ public class MonDataSQLWriteAccess {
         try {
             insertValuesStmt = connection.createStatement();
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             return;
         }
 
@@ -90,7 +90,7 @@ public class MonDataSQLWriteAccess {
         try {
             insertValuesStmt.executeQuery("insert into Timestamp (monSeqID, timestamp) VALUES ( (SELECT ID from MonitoringSeq where timestamp=" + firstMonitoringSequenceTimestamp + "), " + timestamp + ")");
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
  
 
@@ -111,19 +111,19 @@ public class MonDataSQLWriteAccess {
                 try {
                     insertValuesStmt.addBatch(insertMetricValue);
                 } catch (SQLException ex) {
-                    Configuration.getLogger().log(Level.ERROR, ex);
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
                 }
             }
         }
         try {
             insertValuesStmt.executeBatch();
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
         try {
             insertValuesStmt.close();
         } catch (SQLException ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
     }
 

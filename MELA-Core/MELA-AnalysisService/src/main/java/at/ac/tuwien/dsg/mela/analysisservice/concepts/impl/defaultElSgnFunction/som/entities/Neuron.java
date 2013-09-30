@@ -147,7 +147,7 @@ public class Neuron { //implements Iterable<Neuron> {
         List<Double> neuronWeights = neuron.weights;
 
         if (weights.size() != neuronWeights.size()) {
-            Configuration.getLogger().log(Level.ERROR, "Neurons to compute distance do not have the same weights cardinality");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Neurons to compute distance do not have the same weights cardinality");
 //            System.exit(1);
             return Double.MAX_VALUE;
         }
@@ -182,7 +182,7 @@ public class Neuron { //implements Iterable<Neuron> {
 //
 //    private void updateNeuron(Neuron neuron, SOMStrategy strategy, int level) {
 //        if (level < 1) {
-//            Configuration.getLogger().log(Level.ERROR, "Level < 1");
+//            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Level < 1");
 //            System.exit(1);
 //        }
 //        ArrayList<Double> neuronWeights = neuron.weights;

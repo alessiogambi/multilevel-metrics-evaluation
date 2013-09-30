@@ -51,7 +51,7 @@ import util.Configuration;
  */
 public class JCatascopiaDataSource implements DataSourceI {
 
-    private static final String JCATASCOPIA_REST_API_URL = "http://"+Configuration.getJCatascopiaIP()+"/jcatascopia/restAPI";
+    private String JCATASCOPIA_REST_API_URL = "http://"+Configuration.getJCatascopiaIP()+"/JCatascopia-Web/restAPI";
     private static List<JCatascopiaAgent> poolOfAgents;
     
     static{
@@ -216,6 +216,7 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
         } catch (Exception e) {
+            Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "Error connecting to " + JCATASCOPIA_REST_API_URL);
             Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, e.getMessage(), e);
         } finally {
             if (connection != null) {

@@ -68,7 +68,7 @@ public class AnalysisReport {
                 //get the value of the targeted metric
                 MetricValue targetMetricValue = entry.getValue().getValueForMetric(targetMetric);
                 if (targetMetricValue == null) {
-                    Configuration.getLogger().log(Level.WARN, "Metric " + targetMetric + "not found on " + entry.getKey());
+                    Configuration.getLogger(this.getClass()).log(Level.WARN, "Metric " + targetMetric + "not found on " + entry.getKey());
                 } else {
                     AnalysisReportEntry analysisReportEntry = new AnalysisReportEntry(targetMetric, targetMetricValue, requirement.getConditions(), entry.getKey());
                     if(!analysisReportEntry.isClean()){

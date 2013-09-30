@@ -26,6 +26,9 @@
             <ResultingMetric type="RESOURCE" measurementUnit="ms" name="numberOfVMs"/>
             <Operation value="1" type="SET_VALUE"/>
         </CompositionRule>
+
+ 
+ 
         <CompositionRule TargetMonitoredElementLevel="SERVICE_UNIT">
             <ResultingMetric type="RESOURCE" measurementUnit="ms" name="numberOfVMs"/>
             <Operation MetricSourceMonitoredElementLevel="VM" type="SUM">

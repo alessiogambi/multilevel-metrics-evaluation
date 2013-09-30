@@ -51,8 +51,8 @@ public class Configuration {
 
     }
 
-    public static Logger getLogger() {
-        return logger;
+    public static Logger getLogger(Class loggerClass) {
+        return Logger.getLogger(loggerClass);
     }
 
     public static int getMonitoringAggregationIntervalInSeconds() {

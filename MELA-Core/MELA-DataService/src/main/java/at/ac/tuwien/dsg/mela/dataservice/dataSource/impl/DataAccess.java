@@ -61,22 +61,22 @@ public class DataAccess extends AbstractDataAccess {
         String accessType = Configuration.getMonitoringDataAccessMethod();
         
         if (accessType.equalsIgnoreCase("LocalGanglia")) {
-            Configuration.getLogger().log(Level.INFO, "Using Local Ganglia data source");
+            Configuration.getLogger(DataAccess.class).log(Level.INFO, "Using Local Ganglia data source");
             DataSourceI dataSource = new LocalGangliaLiveDataSource();
             return new DataAccess(dataSource);
         } else if (accessType.equalsIgnoreCase("RemoteGanglia")) {
-            Configuration.getLogger().log(Level.INFO, "Using Remote Ganglia data source");
+            Configuration.getLogger(DataAccess.class).log(Level.INFO, "Using Remote Ganglia data source");
             DataSourceI dataSource = new RemoteGangliaLiveDataSource();
             return new DataAccess(dataSource);
         } else if (accessType.equalsIgnoreCase("JCatascopia")) {
-            Configuration.getLogger().log(Level.INFO, "Using JCatascopia data source");
+            Configuration.getLogger(DataAccess.class).log(Level.INFO, "Using JCatascopia data source");
             return new DataAccess(new JCatascopiaDataSource());
         } else if (accessType.equalsIgnoreCase("Replay")) {
             String monitoringSeqID = Configuration.getStoredMonitoringSequenceID();
             DataSourceI dataSourceI = new GangliaSQLDataSource(monitoringSeqID, "mela", "mela");
             return new DataAccess(dataSourceI);
         } else {
-            Configuration.getLogger().log(Priority.ERROR, "MELA-DataService data access mode not specified or not recognized");
+            Configuration.getLogger(DataAccess.class).log(Priority.ERROR, "MELA-DataService data access mode not specified or not recognized");
             return new DataAccess(new DummyDataSource());
         }
     }
@@ -95,7 +95,7 @@ public class DataAccess extends AbstractDataAccess {
     public synchronized ServiceMonitoringSnapshot getMonitoredData(MonitoredElement m) {
 
         if (m == null) {
-            Configuration.getLogger().log(Level.WARN, "No supplied service configuration");
+            Configuration.getLogger(DataAccess.class).log(Level.WARN, "No supplied service configuration");
             return new ServiceMonitoringSnapshot();
         }
         MonitoredElement structureRoot = m.clone();
@@ -109,8 +109,8 @@ public class DataAccess extends AbstractDataAccess {
                 return new ServiceMonitoringSnapshot();
             }
         } catch (DataAccessException e) {
-            Configuration.getLogger().log(Level.ERROR, e.getMessage(), e);
-            Configuration.getLogger().log(Level.ERROR, "Terminating execution");
+            Configuration.getLogger(DataAccess.class).log(Level.ERROR, e.getMessage(), e);
+            Configuration.getLogger(DataAccess.class).log(Level.ERROR, "Terminating execution");
             System.exit(1);
         }
         
@@ -217,8 +217,8 @@ public class DataAccess extends AbstractDataAccess {
                 return new MonitoredElementMonitoringSnapshot();
             }
         } catch (DataAccessException e) {
-            Configuration.getLogger().log(Level.ERROR, e.getMessage(), e);
-            Configuration.getLogger().log(Level.ERROR, "Terminating execution");
+            Configuration.getLogger(DataAccess.class).log(Level.ERROR, e.getMessage(), e);
+            Configuration.getLogger(DataAccess.class).log(Level.ERROR, "Terminating execution");
             System.exit(1);
         }
 
@@ -271,8 +271,8 @@ public class DataAccess extends AbstractDataAccess {
                 return new ArrayList<Metric>();
             }
         } catch (DataAccessException e) {
-            Configuration.getLogger().log(Level.ERROR, e.getMessage(), e);
-            Configuration.getLogger().log(Level.ERROR, "Terminating execution");
+            Configuration.getLogger(DataAccess.class).log(Level.ERROR, e.getMessage(), e);
+            Configuration.getLogger(DataAccess.class).log(Level.ERROR, "Terminating execution");
             System.exit(1);
         }
 

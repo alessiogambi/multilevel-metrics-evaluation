@@ -1,14 +1,16 @@
 import urllib, urllib2, sys, httplib
 
-url = "/MELA-AnalysisService-1.0/REST_WS"
-HOST_IP="localhost"
+url = "/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS"
+#HOST_IP="83.212.112.35"
+#HOST_IP="83.212.117.112"
+HOST_IP="localhost:8080"
 
  
 
 if __name__=='__main__':
-	connection =  httplib.HTTPConnection(HOST_IP+':8080')
+	connection =  httplib.HTTPConnection(HOST_IP)
         #read composition rules file
-        composition_file = open("./compositionRules.xml", "r")
+        composition_file = open("./compositionRulesATHENA.xml", "r")
         body_content =  composition_file.read()
        
         headers={

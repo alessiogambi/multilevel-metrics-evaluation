@@ -79,7 +79,7 @@ public class MELA_WS {
 //        Map<Metric, List<MetricValue>> map = systemControl.getElasticityPathway(element);
 //        
 //        if (map == null) {
-//            Configuration.getLogger().log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
+//            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Service Element " + element.getId() + " at level " + element.getLevel() + " was not found in service structure");
 //            JSONObject elSpaceJSON = new JSONObject();
 //            elSpaceJSON.put("name", "Service not found");
 //            return elSpaceJSON.toJSONString();
@@ -117,7 +117,7 @@ public class MELA_WS {
         if (compositionRulesConfiguration != null) {
             systemControl.setCompositionRulesConfiguration(compositionRulesConfiguration);
         } else {
-            Configuration.getLogger().log(Level.WARN, "supplied compositionRulesConfiguration is null");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "supplied compositionRulesConfiguration is null");
         }
     }
 
@@ -132,7 +132,7 @@ public class MELA_WS {
         if (element != null) {
             systemControl.setServiceConfiguration(element);
         } else {
-            Configuration.getLogger().log(Level.WARN, "supplied service description is null");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "supplied service description is null");
         }
     }
         
@@ -149,7 +149,7 @@ public class MELA_WS {
         if (element != null) {
             systemControl.updateServiceConfiguration(element);
         } else {
-            Configuration.getLogger().log(Level.WARN, "supplied service description is null");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "supplied service description is null");
         }
     }
 
@@ -165,7 +165,7 @@ public class MELA_WS {
         if (requirements != null) {
             systemControl.setRequirements(requirements);
         } else {
-            Configuration.getLogger().log(Level.WARN, "supplied service requirements are null");
+            Configuration.getLogger(this.getClass()).log(Level.WARN, "supplied service requirements are null");
         }
     }
 

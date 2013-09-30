@@ -59,7 +59,7 @@ public class LocalGangliaLiveDataSource implements DataSourceI {
 
                 //if ganglia does not respond
                 if (line.contains("Unable to connect")) {
-                    Configuration.getLogger().log(Level.WARN, "Unable to execute " + cmd);
+                    Configuration.getLogger(this.getClass()).log(Level.WARN, "Unable to execute " + cmd);
                     return null;
                 }
                 if (line.contains("<") || line.endsWith("]>")) {
@@ -74,11 +74,11 @@ public class LocalGangliaLiveDataSource implements DataSourceI {
 
             //if ganglia does not respond
             if (content == null || content.length() == 0) {
-                Configuration.getLogger().log(Level.WARN, "" + "Unable to execute " + cmd);
+                Configuration.getLogger(this.getClass()).log(Level.WARN, "" + "Unable to execute " + cmd);
                 return new ClusterInfo();
             }
         } catch (Exception ex) {
-            Configuration.getLogger().log(Level.ERROR, ex);
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
             return new ClusterInfo();
         }
 
@@ -94,13 +94,13 @@ public class LocalGangliaLiveDataSource implements DataSourceI {
 
             return gangliaClusterInfo;
         } catch (Exception e) {
-            Configuration.getLogger().log(Level.WARN, e.getMessage());
+            Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage());
             return new ClusterInfo();
         }
     }
 
 //    private void saveRawDataToFile(String file, GangliaClusterInfo gangliaClusterInfo) {
-////        Configuration.getLogger().log(Level.INFO,"Collected monitoring data at " + new Date());
+////        Configuration.getLogger(this.getClass()).log(Level.INFO,"Collected monitoring data at " + new Date());
 //        try {
 //            String elasticity = yaml.dump(gangliaClusterInfo);
 //            //better to open close buffers as there are less chances I get the file in unstable state if I terminate the
@@ -111,7 +111,7 @@ public class LocalGangliaLiveDataSource implements DataSourceI {
 //            bufferedWriter.flush();
 //            bufferedWriter.close();
 //        } catch (Exception e) {
-//            Configuration.getLogger().log(Level.WARN, e.getMessage(), e);
+//            Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage(), e);
 //            e.printStackTrace();
 //        }
 //    }

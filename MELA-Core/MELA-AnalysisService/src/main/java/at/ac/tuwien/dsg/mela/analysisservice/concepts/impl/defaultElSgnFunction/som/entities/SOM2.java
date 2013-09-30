@@ -406,7 +406,7 @@ public class SOM2 extends SOM {
             }
         }
         if (!identified) {
-            Configuration.getLogger().log(Level.ERROR, "Neuron not found");
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, "Neuron not found");
             System.exit(1);
         }
         Double distance = 0d;
