@@ -41,10 +41,21 @@ public class Configuration {
 
     static {
         configuration = new Properties();
+        String date = new Date().toString();
+        date = date.replace(" ", "_");
+        date = date.replace(":", "_");
+        System.getProperties().put("recording_date", date);
+
+
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 //            ClassLoader classLoader = Configuration.class.getClassLoader();
             InputStream propertiesStream = classLoader.getResourceAsStream("/config/Config.properties");
+
+            //try with file
+            if (propertiesStream == null) {
+                propertiesStream = classLoader.getResourceAsStream("./config/Config.properties");
+            }
 
             //try with file
             if (propertiesStream == null) {
@@ -54,6 +65,12 @@ public class Configuration {
             configuration.load(propertiesStream);
 
             InputStream log4jStream = classLoader.getResourceAsStream("/config/Log4j.properties");
+
+
+            if (log4jStream == null) {
+                log4jStream = classLoader.getResourceAsStream("./config/Log4j.properties");
+            }
+
             if (log4jStream == null) {
                 log4jStream = new FileInputStream(new File("./config/Log4j.properties"));
             }
@@ -61,11 +78,6 @@ public class Configuration {
 
             if (log4jStream != null) {
                 PropertyConfigurator.configure(log4jStream);
-                String date = new Date().toString();
-                date = date.replace(" ", "_");
-                date = date.replace(":", "_");
-                System.getProperties().put("recording_date", date);
-
                 logger = Logger.getLogger("rootLogger");
             } else {
                 logger = Logger.getLogger("rootLogger");
@@ -139,7 +151,6 @@ public class Configuration {
             return 9123; //default 2 frames
         }
     }
- 
 
     public static String getDataServiceIP() {
         if (configuration.containsKey("MELA_DATA_SERVICE_IP")) {
@@ -148,8 +159,7 @@ public class Configuration {
             return "localhost";
         }
     }
-    
-    
+
     public static String getJCatascopiaIP() {
         if (configuration.containsKey("JCATASCOPIA_IP")) {
             return configuration.getProperty("JCATASCOPIA_IP");
