@@ -37,9 +37,11 @@
         <script type="text/javascript">
             
             //change these to reflect the MELA RESTfull API location
-            var dataSource = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/monitoringdataJSON";
-            var metricsSource = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/metriccompositionrules";
-            var elSpaceHTMLURL = "http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/mela_vis/elasticitySpaceAndPathway.html?";
+           //var deploymentIP = "http://localhost:8080";
+            var deploymentIP = "http://83.212.117.112";
+            var dataSource = deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/monitoringdataJSON");
+            var metricsSource = deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/metriccompositionrules");
+            var elSpaceHTMLURL = deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/mela_vis/elasticitySpaceAndPathway.html?");
 
             setTimeout(refreshPage, 5000);
             

@@ -422,6 +422,10 @@ public class ConvertToJSON {
                 continue;
             }
 
+            if(compositionRule.getTargetMonitoredElementLevel() == null){
+                System.out.println(resultingMetric.getName() + " " + resultingMetric.getMeasurementUnit());
+            }
+            
             JSONObject jsonMetric = new JSONObject();
             jsonMetric.put("name", resultingMetric.getName());
             jsonMetric.put("targetLevel", compositionRule.getTargetMonitoredElementLevel().toString());

@@ -29,8 +29,10 @@
     <script src="http://d3js.org/d3.v3.js"></script>
     <script>
 
-        var elasticitySpaceURL="http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/elasticityspace";
-        var elasticityPathwayURL="http://localhost:8080/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/elasticitypathway";
+        //var deploymentIP = "http://localhost:8080";
+        var deploymentIP = "http://83.212.117.112";
+        var elasticitySpaceURL=deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/elasticityspace");
+        var elasticityPathwayURL=deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/elasticitypathway");
 
         var margin = {top:20, right:20, bottom:30, left:100},
         width = 500 - margin.left - margin.right,

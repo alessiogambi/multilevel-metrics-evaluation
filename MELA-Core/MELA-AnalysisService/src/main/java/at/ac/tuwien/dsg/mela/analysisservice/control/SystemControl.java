@@ -101,7 +101,6 @@ public class SystemControl {
 
         instantMonitoringDataEnrichmentEngine = new DataAggregationEngine();
         instantMonitoringDataAnalysisEngine = new InstantMonitoringDataAnalysisEngine();
-        monitoringTimer = new Timer();
 
         latestMonitoringData = new ServiceMonitoringSnapshot();
         historicalMonitoringData = new ArrayList<ServiceMonitoringSnapshot>();
@@ -145,6 +144,9 @@ public class SystemControl {
         if (requirements != null) {
             elasticitySpaceFunction.setRequirements(requirements);
         }
+        monitoringTimer.cancel();
+        monitoringTimer.purge();
+        startMonitoring();
     }
 
     //actually removes all VMs and Virtual Clusters from the ServiceUnit and adds new ones.
@@ -330,7 +332,8 @@ public class SystemControl {
         return latestMonitoringData;
     }
 
-    private final synchronized void startMonitoring() {
+    private synchronized void startMonitoring() {
+        monitoringTimer = new Timer();
 
         task = new TimerTask() {
             @Override
@@ -498,7 +501,7 @@ public class SystemControl {
         }
 
         elasticityPathway.trainElasticityPathway(map);
-        
+
 
         List<Neuron> neurons = elasticityPathway.getSituationGroups();
         if (metrics == null) {
@@ -507,7 +510,7 @@ public class SystemControl {
             elSpaceJSON.put("name", "Service not found");
             return elSpaceJSON.toJSONString();
         } else {
-            return ConvertToJSON.convertElasticityPathway(metrics, neurons);            
+            return ConvertToJSON.convertElasticityPathway(metrics, neurons);
         }
     }
 

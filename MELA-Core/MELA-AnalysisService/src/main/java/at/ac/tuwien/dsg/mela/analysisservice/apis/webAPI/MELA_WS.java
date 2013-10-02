@@ -1,11 +1,13 @@
 /**
- * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group E184
+ * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group
+ * E184
  *
- * This work was partially supported by the European Commission in terms of the CELAR FP7 project (FP7-ICT-2011-8 \#317790)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at
+ * This work was partially supported by the European Commission in terms of the
+ * CELAR FP7 project (FP7-ICT-2011-8 \#317790)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -46,18 +48,17 @@ import javax.ws.rs.QueryParam;
 import org.apache.log4j.Level;
 import org.json.simple.JSONObject;
 
-
 /**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
-
- **/
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at  *
+ *
+ */
 @Path("/")
 public class MELA_WS {
 
     private static SystemControl systemControl;
 
     static {
+        Configuration.getLogger(MELA_WS.class).log(Level.INFO, "MELA started");
         systemControl = SystemControlFactory.getSystemControlInstance();
     }
     @Context
@@ -84,9 +85,9 @@ public class MELA_WS {
 //            elSpaceJSON.put("name", "Service not found");
 //            return elSpaceJSON.toJSONString();
 //        }
-        
+
 //        Runtime.getRuntime().gc();
-        return  systemControl.getElasticityPathwayLazy(element);
+        return systemControl.getElasticityPathwayLazy(element);
 //        return ConvertToJSON.convertElasticityPathway(new ArrayList<Metric>(map.keySet()), neurons);
     }
 
@@ -102,7 +103,7 @@ public class MELA_WS {
     @Consumes("application/xml")
     @Produces("application/json")
     public String getLatestElasticitySpaceInJSON(MonitoredElement element) {
-       return systemControl.getElasticitySpaceLazy(element);
+        return systemControl.getElasticitySpaceLazy(element);
     }
 
     /**
@@ -135,11 +136,11 @@ public class MELA_WS {
             Configuration.getLogger(this.getClass()).log(Level.WARN, "supplied service description is null");
         }
     }
-        
-     /**
+
+    /**
      *
-     * @param element refreshes the VM's attached to each Service Unit.
-     * For a structural update, use "PUT servicedescription", as in such a case the 
+     * @param element refreshes the VM's attached to each Service Unit. For a
+     * structural update, use "PUT servicedescription", as in such a case the
      * elasticity signature needs to be recomputed
      */
     @POST
