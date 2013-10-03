@@ -352,7 +352,7 @@ public class ConvertToJSON {
                                 for (Requirement requirement : list) {
                                     for (Condition condition : requirement.getConditions()) {
                                         JSONObject conditionJSON = new JSONObject();
-                                        conditionJSON.put("name", condition.toString());
+                                        conditionJSON.put("name", "MUST BE " + condition.toString());
                                         conditionJSON.put("type", "requirement");
                                         conditions.add(conditionJSON);
                                     }
