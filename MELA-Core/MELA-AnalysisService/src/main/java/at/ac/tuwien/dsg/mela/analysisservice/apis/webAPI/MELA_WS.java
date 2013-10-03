@@ -19,7 +19,6 @@
  */
 package at.ac.tuwien.dsg.mela.analysisservice.apis.webAPI;
 
-import at.ac.tuwien.dsg.mela.analysisservice.concepts.ElasticitySpace;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.Metric;
 import at.ac.tuwien.dsg.mela.common.requirements.Requirements;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
@@ -29,7 +28,6 @@ import at.ac.tuwien.dsg.mela.analysisservice.control.SystemControlFactory;
 import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionRulesConfiguration;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.Action;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
-import at.ac.tuwien.dsg.mela.analysisservice.gui.ConvertToJSON;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.Configuration;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.exceptions.ConfigurationException;
 import com.thoughtworks.xstream.XStream;
@@ -46,7 +44,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import org.apache.log4j.Level;
-import org.json.simple.JSONObject;
 
 /**
  * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at  *
@@ -218,7 +215,8 @@ public class MELA_WS {
     @Path("/monitoringdataJSON")
     @Produces("application/json")
     public String getLatestMonitoringDataInJSON() {
-        return ConvertToJSON.convertMonitoringSnapshot(systemControl.getLatestMonitoringData(), systemControl.getRequirements(), systemControl.getActionsInExecution());
+        return systemControl.getLatestMonitoringDataINJSON();
+     
     }
 
     @GET
@@ -237,13 +235,8 @@ public class MELA_WS {
     @Path("/metriccompositionrules")
     @Produces("application/json")
     public String getMetricCompositionRules() {
-        if (systemControl.getCompositionRulesConfiguration() != null) {
-            return ConvertToJSON.convertToJSON(systemControl.getCompositionRulesConfiguration().getMetricCompositionRules());
-        } else {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("name", "No composition rules yet");
-            return jsonObject.toJSONString();
-        }
+        return systemControl.getMetricCompositionRules();
+        
 
     }
 

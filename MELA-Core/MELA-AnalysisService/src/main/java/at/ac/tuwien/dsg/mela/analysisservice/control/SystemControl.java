@@ -548,4 +548,18 @@ public class SystemControl {
 
         return jsonRepr;
     }
+
+    public String getLatestMonitoringDataINJSON() {
+        return ConvertToJSON.convertMonitoringSnapshot(latestMonitoringData, requirements, actionsInExecution);
+    }
+
+    public String getMetricCompositionRules() {
+        if (compositionRulesConfiguration != null) {
+            return ConvertToJSON.convertToJSON(compositionRulesConfiguration.getMetricCompositionRules());
+        } else {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", "No composition rules yet");
+            return jsonObject.toJSONString();
+        }
+    }
 }
