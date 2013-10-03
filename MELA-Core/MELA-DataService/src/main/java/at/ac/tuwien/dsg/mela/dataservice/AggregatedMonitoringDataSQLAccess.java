@@ -58,7 +58,25 @@ public class AggregatedMonitoringDataSQLAccess {
             Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
 
-        connection = getConnection();
+        //instantiate connection first
+        {
+
+            //if the SQL connection fails, try to reconnect, as the MELA_DataService might not be running.
+            //BUSY wait used
+            while (connection == null) {
+                try {
+                    connection = DriverManager.getConnection("jdbc:hsqldb:hsql://" + Configuration.getDataServiceIP() + ":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
+                } catch (SQLException ex) {
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+                    Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
+            }
+        }
 
         {//create a new table to hold the elasticity space
             Statement deleteTableIfExisting = null;
@@ -135,7 +153,7 @@ public class AggregatedMonitoringDataSQLAccess {
         } finally {
             try {
                 connection.commit();
-               /// connection.close();
+                /// connection.close();
             } catch (SQLException ex) {
                 Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
@@ -171,7 +189,7 @@ public class AggregatedMonitoringDataSQLAccess {
             return 0;
         } finally {
 //            try {
-               /// connection.close();
+            /// connection.close();
 //            } catch (SQLException ex) {
 //                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 //            }
