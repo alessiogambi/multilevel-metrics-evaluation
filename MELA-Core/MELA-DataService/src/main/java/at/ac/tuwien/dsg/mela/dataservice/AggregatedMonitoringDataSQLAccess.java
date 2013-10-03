@@ -42,6 +42,7 @@ public class AggregatedMonitoringDataSQLAccess {
     private static final String AGGREGATED_DATA_TABLE_NAME = "AggregatedData";
     private String username;
     private String password;
+    private Connection connection;
 //    private PreparedStatement insertMonitoringEntryPreparedStatement;
 //    private PreparedStatement getMonitoringEntryPreparedStatement;
 //    private PreparedStatement getEntriesCountPreparedStatement;
@@ -57,7 +58,7 @@ public class AggregatedMonitoringDataSQLAccess {
             Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         }
 
-        Connection connection = getConnection();
+        connection = getConnection();
 
         {//create a new table to hold the elasticity space
             Statement deleteTableIfExisting = null;
@@ -84,31 +85,35 @@ public class AggregatedMonitoringDataSQLAccess {
 //    
 
     private Connection getConnection() {
+        try {
+            //check if connection is open. if not, it gives exception
+            String catalog = connection.getCatalog();
+        } catch (SQLException e) {
 
-        Connection connection = null;
+            connection = null;
 
-        //if the SQL connection fails, try to reconnect, as the MELA_DataService might not be running.
-        //BUSY wait used
-        while (connection == null) {
-            try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
-            } catch (SQLException ex) {
-                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
-                Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+            //if the SQL connection fails, try to reconnect, as the MELA_DataService might not be running.
+            //BUSY wait used
+            while (connection == null) {
+                try {
+                    connection = DriverManager.getConnection("jdbc:hsqldb:hsql://" + Configuration.getDataServiceIP() + ":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
+                } catch (SQLException ex) {
+                    Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+                    Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
             }
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
+
         }
-
-
         return connection;
     }
 
     public void writeMonitoringData(ServiceMonitoringSnapshot monitoringSnapshot) {
-        Connection connection = getConnection();
+        connection = getConnection();
         PreparedStatement insertMonitoringEntryPreparedStatement = null;
         {
             try {
@@ -130,7 +135,7 @@ public class AggregatedMonitoringDataSQLAccess {
         } finally {
             try {
                 connection.commit();
-                connection.close();
+               /// connection.close();
             } catch (SQLException ex) {
                 Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
@@ -139,7 +144,7 @@ public class AggregatedMonitoringDataSQLAccess {
 
     //gets the maximum ID encountered
     public int getRecordsCount() {
-        Connection connection = getConnection();
+        connection = getConnection();
         PreparedStatement getEntriesCountPreparedStatement = null;
         {
             try {
@@ -165,11 +170,11 @@ public class AggregatedMonitoringDataSQLAccess {
 
             return 0;
         } finally {
-            try {
-                connection.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
+//            try {
+               /// connection.close();
+//            } catch (SQLException ex) {
+//                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            }
         }
     }
 
@@ -180,7 +185,7 @@ public class AggregatedMonitoringDataSQLAccess {
      * @return returns maximum count elements
      */
     public List<ServiceMonitoringSnapshot> extractMonitoringData(int startIndex, int count) {
-        Connection connection = getConnection();
+        connection = getConnection();
         PreparedStatement getMonitoringEntryPreparedStatement = null;
         {
             try {
@@ -209,11 +214,11 @@ public class AggregatedMonitoringDataSQLAccess {
         } catch (SQLException ex) {
             Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         } finally {
-            try {
-                connection.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
+//            try {
+//               /// connection.close();
+//            } catch (SQLException ex) {
+//                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            }
             return monitoringSnapshots;
         }
     }
@@ -225,7 +230,7 @@ public class AggregatedMonitoringDataSQLAccess {
      * @return returns maximum count elements
      */
     public List<ServiceMonitoringSnapshot> extractMonitoringData() {
-        Connection connection = getConnection();
+        connection = getConnection();
 
         String sql = "SELECT data from " + AGGREGATED_DATA_TABLE_NAME + ";";
 
@@ -243,11 +248,11 @@ public class AggregatedMonitoringDataSQLAccess {
         } catch (SQLException ex) {
             Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
         } finally {
-            try {
-                connection.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
+//            try {
+//               /// connection.close();
+//            } catch (SQLException ex) {
+//                Logger.getLogger(AggregatedMonitoringDataSQLAccess.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//            }
             return monitoringSnapshots;
         }
     }
@@ -279,6 +284,6 @@ public class AggregatedMonitoringDataSQLAccess {
 //
 //    }
     public void closeConnection() throws SQLException {
-//        connection.close();
+//       /// connection.close();
     }
 }

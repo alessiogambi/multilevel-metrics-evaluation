@@ -51,11 +51,11 @@ import util.Configuration;
  */
 public class JCatascopiaDataSource implements DataSourceI {
 
-    private String JCATASCOPIA_REST_API_URL = "http://"+Configuration.getJCatascopiaIP()+"/JCatascopia-Web/restAPI";
+    private String JCATASCOPIA_REST_API_URL = "http://" + Configuration.getJCatascopiaIP() + "/JCatascopia-Web/restAPI";
     private static List<JCatascopiaAgent> poolOfAgents;
-    
-    static{
-        poolOfAgents  = new ArrayList<JCatascopiaAgent>();
+
+    static {
+        poolOfAgents = new ArrayList<JCatascopiaAgent>();
     }
 
     /**
@@ -70,54 +70,59 @@ public class JCatascopiaDataSource implements DataSourceI {
      * @throws DataAccessException
      */
     public ClusterInfo getMonitoringData() throws DataAccessException {
-        
+
         ClusterInfo clusterInfo = new ClusterInfo();
-        
+
         //map for holding the IP, and HostInfo, as maybe multiple JCatascopia agents can belong to the same VM, make sure we merge all data
-        Map<String,HostInfo> hostsMap = new HashMap<String, HostInfo>();
+        Map<String, HostInfo> hostsMap = new HashMap<String, HostInfo>();
+
+        updateJCatascopiaAgents(poolOfAgents);
         
-         updateJCatascopiaAgents(poolOfAgents);
-         for(JCatascopiaAgent agent: poolOfAgents){
-             //if agent is active
-            if(agent.getStatus().equalsIgnoreCase("UP")){
-               HostInfo hostInfo = null; 
-               if(hostsMap.containsKey(agent.getIp())){
-                  hostInfo =  hostsMap.get(agent.getIp());
-               }else{
-                  hostInfo = new HostInfo();
-                  hostInfo.setIp(agent.getIp());
-                  hostInfo.setName(agent.getIp());
-                  hostsMap.put(hostInfo.getIp(),hostInfo);
-               } 
-               
-               //update metrics using REST API from JCatascopia
-               updateMetricsForJCatascopiaAgent(agent);
-               getLatestMetricsValuesForJCatascopiaAgent(agent);
-               
-               for(JCatascopiaMetric metric : agent.getAgentMetrics()){
-                   MetricInfo info = new MetricInfo();
-                   info.setName(metric.getName());
-                   info.setType(metric.getType());
-                   info.setUnits(metric.getUnit());
-                   info.setValue(metric.getValue());
-                   info.setSource(metric.getGroup());
-                   Object o = info.getConvertedValue();
-                   MetricValue metricValue = new MetricValue(o);
-                   String meString = metricValue.getValueRepresentation();
-                   
-                   //add the metric tot he hosts info
-                   hostInfo.getMetrics().add(info);
-               }
-               
-            } else{
-                Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "Agent {0} with IP {1} is down", new Object[]{agent.getId(),agent.getIp()});
+        for (JCatascopiaAgent agent : poolOfAgents) {
+            //if agent is active
+            if (agent.getStatus().equalsIgnoreCase("UP")) {
+                HostInfo hostInfo = null;
+                if (hostsMap.containsKey(agent.getIp())) {
+                    hostInfo = hostsMap.get(agent.getIp());
+                } else {
+                    hostInfo = new HostInfo();
+                    hostInfo.setIp(agent.getIp());
+                    hostInfo.setName(agent.getIp());
+                    hostsMap.put(hostInfo.getIp(), hostInfo);
+                }
+
+                //update metrics using REST API from JCatascopia
+                updateMetricsForJCatascopiaAgent(agent);
+                getLatestMetricsValuesForJCatascopiaAgent(agent);
+
+                for (JCatascopiaMetric metric : agent.getAgentMetrics()) {
+                    MetricInfo info = new MetricInfo();
+                    info.setName(metric.getName());
+                    info.setType(metric.getType());
+                    info.setUnits(metric.getUnit());
+                    info.setValue(metric.getValue());
+                    info.setSource(metric.getGroup());
+                    Object o = info.getConvertedValue();
+//                    MetricValue metricValue = new MetricValue(o);
+                    if (o == null) {
+//                        Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "Metric \"{0}\" converted from \"{1}\" was null", new Object[]{metric.getName(), metric.getValue()});
+                    } else {
+                        hostInfo.getMetrics().add(info);
+                    }
+//                   String meString = metricValue.getValueRepresentation();
+                    //add the metric to the hosts info
+
+                }
+
+            } else {
+                Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "Agent {0} with IP {1} is down", new Object[]{agent.getId(), agent.getIp()});
             }
-            
+
         }
 
         //add metrics to clusterInfo
         clusterInfo.setHostsInfo(hostsMap.values());
-        
+
         return clusterInfo;
     }
 
@@ -153,15 +158,15 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
             InputStream inputStream = connection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));  
-            
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
             String agentsDescription = "";
-            
+
             String line = "";
-            while ((line=bufferedReader.readLine())!=null){
+            while ((line = bufferedReader.readLine()) != null) {
                 agentsDescription += line;
             }
-            
+
             JSONObject object = new JSONObject(agentsDescription);
             if (object.has("agents")) {
                 JSONArray agents = object.getJSONArray("agents");
@@ -258,16 +263,16 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
             InputStream inputStream = connection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));  
-            
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
             String availableMetrics = "";
-            
+
             String line = "";
-            while ((line=bufferedReader.readLine())!=null){
+            while ((line = bufferedReader.readLine()) != null) {
                 availableMetrics += line;
             }
-            
-            
+
+
             JSONObject object = new JSONObject(availableMetrics);
             if (object.has("metrics")) {
                 JSONArray metrics = object.getJSONArray("metrics");
@@ -277,7 +282,7 @@ public class JCatascopiaDataSource implements DataSourceI {
                 int nrOfMetricsReportedByJCatascopia = metrics.length();
                 int nrOfMetricsInAgent = agentMetrics.size();
                 int sizeDifference = nrOfMetricsInAgent - nrOfMetricsReportedByJCatascopia;
- 
+
                 //resize agents metrics list
                 if (sizeDifference < 0) {
                     //inchrease agents pool
@@ -289,13 +294,13 @@ public class JCatascopiaDataSource implements DataSourceI {
                         agentMetrics.remove(0);
                     }
                 }
-              
+
 
                 //populate the metrics pool
                 for (int i = 0; i < metrics.length(); i++) {
                     JSONObject metric = metrics.getJSONObject(i);
                     JCatascopiaMetric jCatascopiaMetric = agentMetrics.get(i);
-                    
+
                     //get agent metricID
                     if (metric.has("metricID")) {
                         jCatascopiaMetric.setId(metric.getString("metricID"));
@@ -309,21 +314,21 @@ public class JCatascopiaDataSource implements DataSourceI {
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia name not found in {0}", availableMetrics);
                     }
-                    
+
                     //get agent units
                     if (metric.has("units")) {
                         jCatascopiaMetric.setUnit(metric.getString("units"));
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia units not found in {0}", availableMetrics);
                     }
-                    
+
                     //get agent type
                     if (metric.has("type")) {
                         jCatascopiaMetric.setType(metric.getString("type"));
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia type not found in {0}", availableMetrics);
                     }
-                    
+
                     //get agent group
                     if (metric.has("group")) {
                         jCatascopiaMetric.setGroup(metric.getString("group"));
@@ -347,7 +352,7 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
         }
     }
-    
+
     /**
      * Example of JSON response to process {"metrics":[
      * {"metricID":"2b7fc7766b064046ad472e1dbd6014ba:cpuTotal","name":"cpuTotal",
@@ -358,8 +363,11 @@ public class JCatascopiaDataSource implements DataSourceI {
      * "value":"55.54367","timestamp":"14:51:28"} ]}
      */
     /**
-     * Acts directly on the supplied agent and populates its metric list with values
-     * @param agent the agent for which the latest metric values will be retrieved 
+     * Acts directly on the supplied agent and populates its metric list with
+     * values
+     *
+     * @param agent the agent for which the latest metric values will be
+     * retrieved
      */
     private void getLatestMetricsValuesForJCatascopiaAgent(JCatascopiaAgent agent) {
         URL url = null;
@@ -376,19 +384,19 @@ public class JCatascopiaDataSource implements DataSourceI {
             //write message body
             OutputStream os = connection.getOutputStream();
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(os));
-            String getMetricsInfoQuerry  = "metrics=";
-            for(JCatascopiaMetric metric : agent.getAgentMetrics()){
-                getMetricsInfoQuerry += metric.getId()+ ",";
+            String getMetricsInfoQuerry = "metrics=";
+            for (JCatascopiaMetric metric : agent.getAgentMetrics()) {
+                getMetricsInfoQuerry += metric.getId() + ",";
             }
-            
+
             //cut the last ","
-            getMetricsInfoQuerry = getMetricsInfoQuerry.substring(0,getMetricsInfoQuerry.lastIndexOf(","));
-            
+            getMetricsInfoQuerry = getMetricsInfoQuerry.substring(0, getMetricsInfoQuerry.lastIndexOf(","));
+
             bufferedWriter.write(getMetricsInfoQuerry);
             bufferedWriter.flush();
             os.flush();
             os.close();
-            
+
             InputStream errorStream = connection.getErrorStream();
             if (errorStream != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
@@ -399,36 +407,36 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
 
             InputStream inputStream = connection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));  
-            
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
             String availableMetrics = "";
-            
+
             String line = "";
-            while ((line=bufferedReader.readLine())!=null){
+            while ((line = bufferedReader.readLine()) != null) {
                 availableMetrics += line;
             }
-            
+
             JSONObject object = new JSONObject(availableMetrics);
             if (object.has("metrics")) {
                 JSONArray metrics = object.getJSONArray("metrics");
                 List<JCatascopiaMetric> agentMetrics = agent.getAgentMetrics();
-                
+
                 //map of metric indexed on IDs to find easier the metrics (avoids for in for)
                 Map<String, JCatascopiaMetric> metricsMap = new HashMap<String, JCatascopiaMetric>(0);
-                for(JCatascopiaMetric jCatascopiaMetric : agentMetrics){
+                for (JCatascopiaMetric jCatascopiaMetric : agentMetrics) {
                     metricsMap.put(jCatascopiaMetric.getId(), jCatascopiaMetric);
                 }
-                
-                
+
+
                 //populate the metrics pool
                 for (int i = 0; i < metrics.length(); i++) {
                     JSONObject metric = metrics.getJSONObject(i);
-                    String metricId=null;
-                    String metricValue=null;
-                    
+                    String metricId = null;
+                    String metricValue = null;
+
                     //get agent metricID
                     if (metric.has("metricID")) {
-                       metricId = metric.getString("metricID");
+                        metricId = metric.getString("metricID");
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia metricID not found in {0}", availableMetrics);
                     }
@@ -439,18 +447,18 @@ public class JCatascopiaDataSource implements DataSourceI {
                     } else {
                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "JCatascopia name not found in {0}", availableMetrics);
                     }
-                    
-                    if(metricId == null || metricValue == null){
+
+                    if (metricId == null || metricValue == null) {
                         continue;
                     }
-                    
-                    if(metricsMap.containsKey(metricId)){
+
+                    if (metricsMap.containsKey(metricId)) {
                         JCatascopiaMetric jCatascopiaMetric = metricsMap.get(metricId);
                         jCatascopiaMetric.setValue(metricValue);
-                    }else{
-                         Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "Unrecognized metricId {0} found in {1}", new Object[]{metricId, availableMetrics});
+                    } else {
+                        Logger.getLogger(JCatascopiaDataSource.class.getName()).log(Level.SEVERE, "Unrecognized metricId {0} found in {1}", new Object[]{metricId, availableMetrics});
                     }
-                     
+
                 }
 
 
@@ -467,7 +475,6 @@ public class JCatascopiaDataSource implements DataSourceI {
             }
         }
     }
-    
 //    public void refreshMonitoringData() {
 //        URL url = null;
 //        HttpURLConnection connection = null;
