@@ -116,7 +116,7 @@ public class SystemControl {
         aggregatedMonitoringDataSQLAccess = new AggregatedMonitoringDataSQLAccess("mela", "mela");
     }
 
-    public MonitoredElement getServiceConfiguration() {
+    public synchronized MonitoredElement getServiceConfiguration() {
         return serviceConfiguration;
     }
 
@@ -134,7 +134,7 @@ public class SystemControl {
         }
     }
 
-    public Map<MonitoredElement, String> getActionsInExecution() {
+    public synchronized Map<MonitoredElement, String> getActionsInExecution() {
         return actionsInExecution;
     }
 
@@ -328,7 +328,7 @@ public class SystemControl {
         this.aggregationWindowsCount = aggregationIntervalInSeconds;
     }
 
-    public ServiceMonitoringSnapshot getLatestMonitoringData() {
+    public synchronized ServiceMonitoringSnapshot getLatestMonitoringData() {
         return latestMonitoringData;
     }
 
@@ -377,7 +377,7 @@ public class SystemControl {
     }
 
     //performs multiple database interrogations (avids using memory)
-    public String getElasticityPathwayLazy(MonitoredElement element) {
+    public synchronized String getElasticityPathwayLazy(MonitoredElement element) {
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
         if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
@@ -428,7 +428,7 @@ public class SystemControl {
     }
 
     //performs multiple database interrogations (avids using memory)
-    public String getElasticitySpaceLazy(MonitoredElement element) {
+    public synchronized String getElasticitySpaceLazy(MonitoredElement element) {
 
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
@@ -468,7 +468,7 @@ public class SystemControl {
     }
 
     //uses a lot of memory (all directly in memory)
-    public String getElasticityPathway(MonitoredElement element) {
+    public synchronized String getElasticityPathway(MonitoredElement element) {
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
         if (!Configuration.isElasticityAnalysisEnabled() || serviceConfiguration == null && compositionRulesConfiguration != null) {
@@ -514,7 +514,7 @@ public class SystemControl {
         }
     }
 
-    public String getElasticitySpace(MonitoredElement element) {
+    public synchronized String getElasticitySpace(MonitoredElement element) {
 
         //if no service configuration, we can't have elasticity space function
         //if no compositionRulesConfiguration we have no data
@@ -549,11 +549,11 @@ public class SystemControl {
         return jsonRepr;
     }
 
-    public String getLatestMonitoringDataINJSON() {
+    public synchronized String getLatestMonitoringDataINJSON() {
         return ConvertToJSON.convertMonitoringSnapshot(latestMonitoringData, requirements, actionsInExecution);
     }
 
-    public String getMetricCompositionRules() {
+    public synchronized String getMetricCompositionRules() {
         if (compositionRulesConfiguration != null) {
             return ConvertToJSON.convertToJSON(compositionRulesConfiguration.getMetricCompositionRules());
         } else {

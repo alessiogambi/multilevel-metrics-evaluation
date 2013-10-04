@@ -421,14 +421,8 @@
         var maxColumns;
         
         document.title = vars[0]+ ": Elasticity Analysis";
-        
-        setTimeout(function () {
-            
-            drawElSpaceAndPathway(vars);
-        
-        }, 5000);
-            
-        function drawElSpaceAndPathway(vars){   
+       
+        function drawElSpace(vars){   
             
             //http request, can do POST to get the Elasticity Space   
             d3.xhr(elasticitySpaceURL,"application/xml").post("<MonitoredElement id=\"" + vars[0] + "\" level=\"" + vars[1] + "\"/>",function(error,dimension){
@@ -460,9 +454,19 @@
                  
                 generateElSpaceChart(elSpace, elSpaceSVG, lineThickness, elSpaceColors, -50, 50, width, height, "Time (s)");
            
+             
+                setTimeout(function () {
             
+                    drawElSpace(vars);
+                   
+                }, 5000);
             });
         
+            
+           
+        }
+        
+        function drawElasticityPathway(vars){
             //get elasticity pathway
             d3.xhr(elasticityPathwayURL,"application/xml").post("<MonitoredElement id=\"" + vars[0] + "\" level=\"" + vars[1] + "\"/>",function(error,dimension){
                
@@ -499,13 +503,13 @@
                 generateElPathwayChart(elPthw, elPthwSVG, elPathwayColors, 0,70 , elSgnChartWidth, height,"Situations Encounter Rate (%)", "Value");
                 setTimeout(function () {
             
-                    drawElSpaceAndPathway(vars);
+                    drawElasticityPathway(vars);
         
                 }, 5000);
             });
-           
         }
         
-        drawElSpaceAndPathway(vars);
+        drawElSpace(vars);
+        drawElasticityPathway(vars);
 
     </script>
