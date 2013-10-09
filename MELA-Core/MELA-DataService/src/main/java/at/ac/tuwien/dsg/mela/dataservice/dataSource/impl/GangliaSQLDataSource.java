@@ -63,7 +63,7 @@ public class GangliaSQLDataSource implements DataSourceI {
         //BUSY wait used
         while (connection == null) {
             try {
-                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":"+Configuration.getDataServicePort()+"/MonitoringDataDB", username, password);
+                connection = DriverManager.getConnection("jdbc:hsqldb:hsql://"+Configuration.getDataServiceIP()+":"+Configuration.getDataServicePort()+"/melaDataServiceDB", username, password);
             } catch (SQLException ex) {
                 Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
                 Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not connect to sql data end. Retrying in 1 second");

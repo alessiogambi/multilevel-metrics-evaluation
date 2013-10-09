@@ -36,45 +36,24 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class Configuration {
 
-    private static Properties configuration;
+    private static final Properties configuration = new Properties();
     static Logger logger;
 
     static {
-        configuration = new Properties();
+
         String date = new Date().toString();
         date = date.replace(" ", "_");
         date = date.replace(":", "_");
         System.getProperties().put("recording_date", date);
 
-
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 //            ClassLoader classLoader = Configuration.class.getClassLoader();
-            InputStream propertiesStream = classLoader.getResourceAsStream("/config/Config.properties");
-
-            //try with file
-            if (propertiesStream == null) {
-                propertiesStream = classLoader.getResourceAsStream("./config/Config.properties");
-            }
-
-            //try with file
-            if (propertiesStream == null) {
-                propertiesStream = new FileInputStream(new File("./config/Config.properties"));
-            }
+            InputStream propertiesStream = Configuration.class.getResourceAsStream("/config/Config.properties");
 
             configuration.load(propertiesStream);
 
-            InputStream log4jStream = classLoader.getResourceAsStream("/config/Log4j.properties");
-
-
-            if (log4jStream == null) {
-                log4jStream = classLoader.getResourceAsStream("./config/Log4j.properties");
-            }
-
-            if (log4jStream == null) {
-                log4jStream = new FileInputStream(new File("./config/Log4j.properties"));
-            }
-
+            InputStream log4jStream = Configuration.class.getResourceAsStream("/config/Log4j.properties");
 
             if (log4jStream != null) {
                 PropertyConfigurator.configure(log4jStream);
@@ -82,11 +61,6 @@ public class Configuration {
             } else {
                 logger = Logger.getLogger("rootLogger");
             }
-
-
-//            //tie System.out and System.err to this logger
-//            System.setOut(createOutLoggingProxy(System.out, logger));
-//            System.setErr(createErrLoggingProxy(System.err, logger));
 
 
         } catch (Exception ex) {
@@ -165,6 +139,14 @@ public class Configuration {
             return configuration.getProperty("JCATASCOPIA_IP");
         } else {
             return "localhost";
+        }
+    }
+
+    public static String getDatabaseFileLocation() {
+        if (configuration.containsKey("DATA_BASE_LOCATION_PATH")) {
+            return configuration.getProperty("DATA_BASE_LOCATION_PATH");
+        } else {
+            return ".";
         }
     }
 }

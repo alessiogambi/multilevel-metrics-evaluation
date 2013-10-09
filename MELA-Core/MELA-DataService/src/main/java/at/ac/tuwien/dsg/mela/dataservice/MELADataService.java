@@ -18,6 +18,8 @@
 package at.ac.tuwien.dsg.mela.dataservice;
 
 import at.ac.tuwien.dsg.mela.dataservice.utils.Configuration;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.apache.log4j.Level;
 import org.hsqldb.Server;
 
@@ -32,24 +34,29 @@ public class MELADataService {
     {
         server = new Server();
         server.setDaemon(true);
-        server.setDatabaseName(0, "MonitoringDataDB");
-        server.setDatabasePath(0, "file:./monitoring/monitoringDB;user=mela;password=mela");
+        server.setDatabaseName(0, "melaDataServiceDB");
+        server.setDatabasePath(0, "file:"+ Configuration.getDatabaseFileLocation() + "/melaDataServiceDB" +";user=mela;password=mela");
         server.setPort(Configuration.getDataServicePort());
         server.setAddress(Configuration.getDataServiceIP());
         
         //username and password : mela mela
         //TODO: add databases for el pathway and space and service types
-//        server.setDatabaseName(1, "MonitoringDataDB");
+//        server.setDatabaseName(1, "melaDataServiceDB");
     }
     
     public void startServer(){
         server.start();
         Configuration.getLogger(this.getClass()).log(Level.INFO, "SQL Server started");
+        new AggregatedMonitoringDataSQLAccess("mela", "mela").createDatabaseStructure();
+        
     }
     
     public void stopServer(){
         server.stop();
     }
+    
+     
+
     
     
     

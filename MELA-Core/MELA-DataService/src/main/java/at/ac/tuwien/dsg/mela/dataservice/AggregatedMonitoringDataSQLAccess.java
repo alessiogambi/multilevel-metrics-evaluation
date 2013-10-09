@@ -65,7 +65,7 @@ public class AggregatedMonitoringDataSQLAccess {
             //BUSY wait used
             while (connection == null) {
                 try {
-                    connection = DriverManager.getConnection("jdbc:hsqldb:hsql://" + Configuration.getDataServiceIP() + ":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
+                    connection = DriverManager.getConnection("jdbc:hsqldb:hsql://" + Configuration.getDataServiceIP() + ":" + Configuration.getDataServicePort() + "/melaDataServiceDB", username, password);
                 } catch (SQLException ex) {
                     Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
                     Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
@@ -78,26 +78,28 @@ public class AggregatedMonitoringDataSQLAccess {
             }
         }
 
-        {//create a new table to hold the elasticity space
-            Statement deleteTableIfExisting = null;
-            try {
-                deleteTableIfExisting = connection.createStatement();
-                deleteTableIfExisting.executeQuery("DROP TABLE " + AGGREGATED_DATA_TABLE_NAME + " IF EXISTS");
-            } catch (SQLException ex) {
-                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
-            }
-        }
-
-
-        { //create a new table to hold the elasticity space
-            Statement createTable = null;
-            try {
-                createTable = connection.createStatement();
-                createTable.executeQuery("create table " + AGGREGATED_DATA_TABLE_NAME + " (ID int IDENTITY, data OTHER);");
-            } catch (SQLException ex) {
-                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
-            }
-        }
+//        {//create a new table to hold the elasticity space
+//            Statement deleteTableIfExisting = null;
+//            try {
+//                deleteTableIfExisting = connection.createStatement();
+//                deleteTableIfExisting.executeQuery("DROP TABLE " + AGGREGATED_DATA_TABLE_NAME + " IF EXISTS");
+//            } catch (SQLException ex) {
+//                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+//            }
+//        }
+//
+//
+//        { //create a new table to hold the elasticity space
+//            Statement createTable = null;
+//            try {
+//                createTable = connection.createStatement();
+//                createTable.executeQuery("create table " + AGGREGATED_DATA_TABLE_NAME + " (ID int IDENTITY, data OTHER);");
+//            } catch (SQLException ex) {
+//                Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+//            }
+//        }
+//        createDatabaseStructure();
+        recreateElasticitySpaceTable();
 
     }
 //    
@@ -114,7 +116,7 @@ public class AggregatedMonitoringDataSQLAccess {
             //BUSY wait used
             while (connection == null) {
                 try {
-                    connection = DriverManager.getConnection("jdbc:hsqldb:hsql://" + Configuration.getDataServiceIP() + ":" + Configuration.getDataServicePort() + "/MonitoringDataDB", username, password);
+                    connection = DriverManager.getConnection("jdbc:hsqldb:hsql://" + Configuration.getDataServiceIP() + ":" + Configuration.getDataServicePort() + "/melaDataServiceDB", username, password);
                 } catch (SQLException ex) {
                     Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
                     Configuration.getLogger(this.getClass()).log(Level.WARN, "Could not conenct to sql data end. Retrying in 1 second");
@@ -128,6 +130,32 @@ public class AggregatedMonitoringDataSQLAccess {
 
         }
         return connection;
+    }
+
+    public final void recreateElasticitySpaceTable() {
+        Connection c = getConnection();
+        try {
+            c.createStatement().executeQuery("DROP TABLE " + AGGREGATED_DATA_TABLE_NAME + " IF EXISTS");
+            c.createStatement().executeQuery("create table " + AGGREGATED_DATA_TABLE_NAME + " (ID int IDENTITY, data OTHER);");
+            c.commit();
+        } catch (SQLException ex) {
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+        }
+
+    }
+
+    public final void createDatabaseStructure() {
+        Connection c = getConnection();
+        try {
+            c.createStatement().execute("create table IF NOT EXISTS MonitoringSeq (ID int IDENTITY, timestamp VARCHAR(200));");
+            c.createStatement().execute("create table IF NOT EXISTS Timestamp (ID int IDENTITY, monSeqID int, timestamp VARCHAR(200), FOREIGN KEY (monSeqID) REFERENCES MonitoringSeq(ID) );");
+            c.createStatement().execute("create table IF NOT EXISTS MetricValue (ID int IDENTITY, monSeqID int, timestampID int, metricName VARCHAR(100), metricUnit VARCHAR(100), metrictype VARCHAR(20), value VARCHAR(50),  vmIP VARCHAR (50), FOREIGN KEY (monSeqID) REFERENCES MonitoringSeq(ID), FOREIGN KEY (timestampID) REFERENCES Timestamp(ID));");
+            c.commit();
+        } catch (SQLException ex) {
+            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+        }
+
+
     }
 
     public void writeMonitoringData(ServiceMonitoringSnapshot monitoringSnapshot) {
