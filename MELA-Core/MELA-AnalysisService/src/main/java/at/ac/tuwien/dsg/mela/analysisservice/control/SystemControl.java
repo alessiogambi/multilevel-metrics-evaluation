@@ -31,7 +31,7 @@ import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElPthwFunction
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElSgnFunction.som.entities.Neuron;
 import at.ac.tuwien.dsg.mela.analysisservice.engines.InstantMonitoringDataAnalysisEngine;
 import at.ac.tuwien.dsg.mela.analysisservice.engines.DataAggregationEngine;
-import at.ac.tuwien.dsg.mela.analysisservice.gui.ConvertToJSON;
+import at.ac.tuwien.dsg.mela.analysisservice.utils.converters.ConvertToJSON;
 import at.ac.tuwien.dsg.mela.analysisservice.report.AnalysisReport;
 import at.ac.tuwien.dsg.mela.dataservice.dataSource.AbstractDataAccess;
 import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionOperation;
@@ -41,7 +41,7 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.Configuration;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.exceptions.ConfigurationException;
 import at.ac.tuwien.dsg.mela.dataservice.AggregatedMonitoringDataSQLAccess;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.DataAccess;
+import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.DataAccesForTestsOnly;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,11 +93,11 @@ public class SystemControl {
         public void run() {
         }
     };
-//    private SystemControl selfReference;
 
+//    private SystemControl selfReference;
     protected SystemControl() {
-//        dataAccess = DataAccesForTestsOnly.createInstance();
-        dataAccess = DataAccess.createInstance();
+        dataAccess = DataAccesForTestsOnly.createInstance();
+//        dataAccess = DataAccess.createInstance();
 
         instantMonitoringDataEnrichmentEngine = new DataAggregationEngine();
         instantMonitoringDataAnalysisEngine = new InstantMonitoringDataAnalysisEngine();
@@ -114,6 +114,14 @@ public class SystemControl {
         }
 
         aggregatedMonitoringDataSQLAccess = new AggregatedMonitoringDataSQLAccess("mela", "mela");
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                stopMonitoring();
+            }
+        });
+
     }
 
     public synchronized MonitoredElement getServiceConfiguration() {
@@ -331,6 +339,8 @@ public class SystemControl {
     public synchronized ServiceMonitoringSnapshot getLatestMonitoringData() {
         return latestMonitoringData;
     }
+    private int monitoringCount = 1800;
+    private int currMonitoringIndex = 0;
 
     private synchronized void startMonitoring() {
         monitoringTimer = new Timer();
@@ -339,7 +349,20 @@ public class SystemControl {
             @Override
             public void run() {
                 if (serviceConfiguration != null) {
+
+                    monitoringCount--;
+                    if (monitoringCount <= 0) {
+                        this.cancel();
+                    }
+
                     ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
+
+                    currMonitoringIndex++;
+                    while (currMonitoringIndex < 0) {
+                        getRawMonitoringData();
+                        currMonitoringIndex++;
+                    }
+
                     if (monitoringData != null) {
                         historicalMonitoringData.add(monitoringData);
                         //remove the oldest and add the new value always
@@ -368,8 +391,8 @@ public class SystemControl {
             }
         };
         //repeat the monitoring every monitoringIntervalInSeconds seconds 
-        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
-//        monitoringTimer.schedule(task, 0,1);
+//        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
+        monitoringTimer.schedule(task, 0, 1);
     }
 
     public synchronized void stopMonitoring() {
@@ -439,6 +462,10 @@ public class SystemControl {
             return elSpaceJSON.toJSONString();
         }
 
+        if (elasticitySpaceFunction != null) {
+            elasticitySpaceFunction.resetElasticitySpace();
+        }
+
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
 
 
@@ -451,7 +478,7 @@ public class SystemControl {
             if (extractedData != null) {
                 //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
-                    monitoringSnapshot.keepOnlyDataForElement(element);
+//                    monitoringSnapshot.keepOnlyDataForElement(element);
                     elasticitySpaceFunction.trainElasticitySpace(monitoringSnapshot);
                 }
             }
