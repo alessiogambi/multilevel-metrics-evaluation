@@ -41,7 +41,7 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.Configuration;
 import at.ac.tuwien.dsg.mela.analysisservice.utils.exceptions.ConfigurationException;
 import at.ac.tuwien.dsg.mela.dataservice.AggregatedMonitoringDataSQLAccess;
-import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.DataAccesForTestsOnly;
+import at.ac.tuwien.dsg.mela.dataservice.dataSource.impl.DataAccess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,8 +96,8 @@ public class SystemControl {
 
 //    private SystemControl selfReference;
     protected SystemControl() {
-        dataAccess = DataAccesForTestsOnly.createInstance();
-//        dataAccess = DataAccess.createInstance();
+//        dataAccess = DataAccesForTestsOnly.createInstance();
+        dataAccess = DataAccess.createInstance();
 
         instantMonitoringDataEnrichmentEngine = new DataAggregationEngine();
         instantMonitoringDataAnalysisEngine = new InstantMonitoringDataAnalysisEngine();
