@@ -391,8 +391,7 @@ public class SystemControl {
             }
         };
         //repeat the monitoring every monitoringIntervalInSeconds seconds 
-//        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
-        monitoringTimer.schedule(task, 0, 1);
+        monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
     }
 
     public synchronized void stopMonitoring() {
