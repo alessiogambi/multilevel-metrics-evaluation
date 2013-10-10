@@ -31,7 +31,7 @@ import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElPthwFunction
 import at.ac.tuwien.dsg.mela.analysisservice.concepts.impl.defaultElSgnFunction.som.entities.Neuron;
 import at.ac.tuwien.dsg.mela.analysisservice.engines.InstantMonitoringDataAnalysisEngine;
 import at.ac.tuwien.dsg.mela.analysisservice.engines.DataAggregationEngine;
-import at.ac.tuwien.dsg.mela.analysisservice.utils.converters.ConvertToJSON;
+import at.ac.tuwien.dsg.mela.analysisservice.gui.ConvertToJSON;
 import at.ac.tuwien.dsg.mela.analysisservice.report.AnalysisReport;
 import at.ac.tuwien.dsg.mela.dataservice.dataSource.AbstractDataAccess;
 import at.ac.tuwien.dsg.mela.common.configuration.metricComposition.CompositionOperation;
@@ -93,8 +93,8 @@ public class SystemControl {
         public void run() {
         }
     };
-
 //    private SystemControl selfReference;
+
     protected SystemControl() {
 //        dataAccess = DataAccesForTestsOnly.createInstance();
         dataAccess = DataAccess.createInstance();
@@ -114,14 +114,6 @@ public class SystemControl {
         }
 
         aggregatedMonitoringDataSQLAccess = new AggregatedMonitoringDataSQLAccess("mela", "mela");
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                stopMonitoring();
-            }
-        });
-
     }
 
     public synchronized MonitoredElement getServiceConfiguration() {
@@ -339,7 +331,11 @@ public class SystemControl {
     public synchronized ServiceMonitoringSnapshot getLatestMonitoringData() {
         return latestMonitoringData;
     }
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> parent of 913949d... Solved issue with elasticity space boundary report
     private synchronized void startMonitoring() {
         monitoringTimer = new Timer();
 
@@ -347,11 +343,15 @@ public class SystemControl {
             @Override
             public void run() {
                 if (serviceConfiguration != null) {
+<<<<<<< HEAD
 
                  
                     ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
 
                  
+=======
+                    ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
+>>>>>>> parent of 913949d... Solved issue with elasticity space boundary report
                     if (monitoringData != null) {
                         historicalMonitoringData.add(monitoringData);
                         //remove the oldest and add the new value always
@@ -381,6 +381,10 @@ public class SystemControl {
         };
         //repeat the monitoring every monitoringIntervalInSeconds seconds 
         monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
+<<<<<<< HEAD
+=======
+//        monitoringTimer.schedule(task, 0,1);
+>>>>>>> parent of 913949d... Solved issue with elasticity space boundary report
     }
 
     public synchronized void stopMonitoring() {
@@ -450,10 +454,6 @@ public class SystemControl {
             return elSpaceJSON.toJSONString();
         }
 
-        if (elasticitySpaceFunction != null) {
-            elasticitySpaceFunction.resetElasticitySpace();
-        }
-
         int recordsCount = aggregatedMonitoringDataSQLAccess.getRecordsCount();
 
 
@@ -466,7 +466,7 @@ public class SystemControl {
             if (extractedData != null) {
                 //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
-//                    monitoringSnapshot.keepOnlyDataForElement(element);
+                    monitoringSnapshot.keepOnlyDataForElement(element);
                     elasticitySpaceFunction.trainElasticitySpace(monitoringSnapshot);
                 }
             }

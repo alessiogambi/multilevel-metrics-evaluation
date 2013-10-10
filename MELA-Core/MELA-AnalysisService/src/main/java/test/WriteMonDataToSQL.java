@@ -16,7 +16,7 @@
  * the License.
  */
 
-package at.ac.tuwien.dsg.mela.analysisservice.utils.converters;
+package test;
 
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.ClusterInfo;
 import at.ac.tuwien.dsg.mela.dataservice.MonDataSQLWriteAccess;
@@ -36,12 +36,10 @@ import org.yaml.snakeyaml.Yaml;
 public class WriteMonDataToSQL {
 
     public static void main(String[] args) throws SQLException {
-//        String monitoringFile = "/home/OGandaniel-tuwien/Documents/DSG_SVN/software/tmp_prototypes/MELA_MAVEN/src/main/resources/config/monitoringSat_Jun_29_19_14_46_CEST_2013";
-        String monitoringFile = "/home/daniel-tuwien/Documents/CELAR_GIT/multilevel-metrics-evaluation/MELA-Core/MELA-AnalysisService/monitoringSat_Jun_29_20_01_04_CEST_2013";
-         
+        String monitoringFile = "/home/daniel-tuwien/Documents/DSG_SVN/software/tmp_prototypes/MELA_MAVEN/src/main/resources/config/monitoringSat_Jun_29_19_14_46_CEST_2013";
         Map<String, ClusterInfo> temp = new LinkedHashMap<String, ClusterInfo>();
 
-        
+        MonDataSQLWriteAccess access = new MonDataSQLWriteAccess("mela","mela");
 
         try {
             Yaml yaml = new Yaml();
@@ -58,7 +56,6 @@ public class WriteMonDataToSQL {
             e.printStackTrace();
         }
 
-        MonDataSQLWriteAccess access = new MonDataSQLWriteAccess("mela","mela");
         for (ClusterInfo gangliaClusterInfo : temp.values()) {
             access.writeMonitoringData(gangliaClusterInfo);
         }

@@ -1,13 +1,11 @@
 /**
- * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group
- * E184
+ * Copyright 2013 Technische Universitat Wien (TUW), Distributed Systems Group E184
  *
- * This work was partially supported by the European Commission in terms of the
- * CELAR FP7 project (FP7-ICT-2011-8 \#317790)
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * This work was partially supported by the European Commission in terms of the CELAR FP7 project (FP7-ICT-2011-8 \#317790)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -17,7 +15,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package at.ac.tuwien.dsg.mela.analysisservice.utils.converters;
+package at.ac.tuwien.dsg.mela.analysisservice.gui;
 
 import at.ac.tuwien.dsg.mela.common.requirements.MetricFilter;
 import at.ac.tuwien.dsg.mela.common.requirements.Condition;
@@ -43,10 +41,12 @@ import org.apache.log4j.Level;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+
 /**
- * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at  *
- *
- */
+ * Author: Daniel Moldovan 
+ * E-Mail: d.moldovan@dsg.tuwien.ac.at 
+
+ **/
 public class ConvertToJSON {
 
     private static DecimalFormat df4 = new DecimalFormat("0.####");
@@ -249,12 +249,13 @@ public class ConvertToJSON {
 //
 //        return string;
 //    }
-    public static String convertMonitoringSnapshot(ServiceMonitoringSnapshot serviceMonitoringSnapshot, Requirements requirements, Map<MonitoredElement, String> actionsInExecution) {
 
-        if (serviceMonitoringSnapshot == null) {
+    public static String convertMonitoringSnapshot(ServiceMonitoringSnapshot serviceMonitoringSnapshot, Requirements requirements, Map<MonitoredElement,String> actionsInExecution) {
+
+        if(serviceMonitoringSnapshot == null){
             return "";
         }
-
+        
         //transform the requirements list in a map which can be used when building the JSON representation
         Map<String, Map<Metric, List<Requirement>>> requirementsMap = new HashMap<String, Map<Metric, List<Requirement>>>();
         if (requirements != null) {
@@ -302,12 +303,12 @@ public class ConvertToJSON {
                 MyPair myPair = processing.remove(0);
                 JSONObject object = myPair.jsonObject;
                 MonitoredElement element = myPair.MonitoredElement;
-
-                if (actionsInExecution.containsKey(element)) {
-                    object.put("attention", true);
-                    object.put("actionName", actionsInExecution.get(element));
+                
+                if(actionsInExecution.containsKey(element)){
+                   object.put("attention", true);
+                   object.put("actionName", actionsInExecution.get(element));
                 }
-
+                
                 JSONArray children = (JSONArray) object.get("children");
                 if (children == null) {
                     children = new JSONArray();
@@ -332,11 +333,10 @@ public class ConvertToJSON {
                     //add metrics
                     for (Map.Entry<Metric, MetricValue> entry : monitoredElementMonitoringSnapshot.getMonitoredData().entrySet()) {
                         JSONObject metric = new JSONObject();
-                        if (entry.getKey().getName().contains("serviceID")) {
+                        if(entry.getKey().getName().contains("serviceID")){
                             continue;
                         }
-
-                        metric.put("name", entry.getValue().getValueRepresentation() + " [" + entry.getKey().getName() + "(" + entry.getKey().getMeasurementUnit() + ")" + "]");
+                        metric.put("name", entry.getValue().getValueRepresentation() + " [" + entry.getKey().getName() + "]");
                         metric.put("type", "metric");
 
                         //if we have requirements for this service element ID
@@ -422,10 +422,10 @@ public class ConvertToJSON {
                 continue;
             }
 
-            if (compositionRule.getTargetMonitoredElementLevel() == null) {
+            if(compositionRule.getTargetMonitoredElementLevel() == null){
                 System.out.println(resultingMetric.getName() + " " + resultingMetric.getMeasurementUnit());
             }
-
+            
             JSONObject jsonMetric = new JSONObject();
             jsonMetric.put("name", resultingMetric.getName());
             jsonMetric.put("targetLevel", compositionRule.getTargetMonitoredElementLevel().toString());

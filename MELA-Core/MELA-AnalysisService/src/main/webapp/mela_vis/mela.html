@@ -180,7 +180,7 @@
 
             var margin = {top:10, right:120, bottom:20, left:120},
             width = 3000,
-            height = 850,
+            height = 650, //850
             i = 0,
             duration = 500,
             depth = 400, //500
@@ -1042,8 +1042,7 @@
                 
                 //metric names in D3JS are "value [metricName]" and need to extract the metricName
                 var indexOfFirstBracket = source.name.match(/\[/);
-//                var indexOfLastBracket = source.name.match(/\]/);
-                var indexOfLastBracket = source.name.match(/\(/);//as I have added (measurementUnit), stop before (
+                var indexOfLastBracket = source.name.match(/\]/);
                 var sourceMetricName = source.name.slice(indexOfFirstBracket.index+1,indexOfLastBracket.index);
                 
                 var sourceMetricParent = source.parent;
@@ -1109,9 +1108,7 @@
                         
                         //metric names in D3JS are "value [metricName]" and need to extract the metricName
                         var childMetricNameIndexOfFirstBracket = childMetric.name.match(/\[/);
-                        
-//                        var childMetricNameIndexOfLastBracket = childMetric.name.match(/\]/);
-                        var childMetricNameIndexOfLastBracket = childMetric.name.match(/\(/); //as I have added (measurementUnit), stop before (
+                        var childMetricNameIndexOfLastBracket = childMetric.name.match(/\]/);
                         var childMetricName = childMetric.name.slice(childMetricNameIndexOfFirstBracket.index+1,childMetricNameIndexOfLastBracket.index);
                              
                         //get the targeted element IDS
@@ -1159,8 +1156,7 @@
                 
                 //metric names in D3JS are "value [metricName]" and need to extract the metricName
                 var indexOfFirstBracket = source.name.match(/\[/);
-//                var indexOfLastBracket = source.name.match(/\]/);
-                var indexOfLastBracket = source.name.match(/\(/);//as I have added (measurementUnit), stop before (
+                var indexOfLastBracket = source.name.match(/\]/);
                 var sourceMetricName = source.name.slice(indexOfFirstBracket.index+1,indexOfLastBracket.index);
                 
                 var sourceMetricParent = source.parent;
@@ -1226,8 +1222,7 @@
                         
                         //metric names in D3JS are "value [metricName]" and need to extract the metricName
                         var childMetricNameIndexOfFirstBracket = childMetric.name.match(/\[/);
-//                        var childMetricNameIndexOfLastBracket = childMetric.name.match(/\]/);
-                        var childMetricNameIndexOfLastBracket = childMetric.name.match(/\(/);//as I have added (measurementUnit), stop before (
+                        var childMetricNameIndexOfLastBracket = childMetric.name.match(/\]/);
                         var childMetricName = childMetric.name.slice(childMetricNameIndexOfFirstBracket.index+1,childMetricNameIndexOfLastBracket.index);
                              
                         //get the targeted element IDS
