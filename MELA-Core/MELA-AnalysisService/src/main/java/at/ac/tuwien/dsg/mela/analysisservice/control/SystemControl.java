@@ -331,11 +331,7 @@ public class SystemControl {
     public synchronized ServiceMonitoringSnapshot getLatestMonitoringData() {
         return latestMonitoringData;
     }
-<<<<<<< HEAD
-   
-=======
-
->>>>>>> parent of 913949d... Solved issue with elasticity space boundary report
+ 
     private synchronized void startMonitoring() {
         monitoringTimer = new Timer();
 
@@ -343,15 +339,9 @@ public class SystemControl {
             @Override
             public void run() {
                 if (serviceConfiguration != null) {
-<<<<<<< HEAD
-
                  
                     ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
-
-                 
-=======
-                    ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
->>>>>>> parent of 913949d... Solved issue with elasticity space boundary report
+ 
                     if (monitoringData != null) {
                         historicalMonitoringData.add(monitoringData);
                         //remove the oldest and add the new value always
@@ -381,10 +371,7 @@ public class SystemControl {
         };
         //repeat the monitoring every monitoringIntervalInSeconds seconds 
         monitoringTimer.schedule(task, 0, monitoringIntervalInSeconds * 1000);
-<<<<<<< HEAD
-=======
-//        monitoringTimer.schedule(task, 0,1);
->>>>>>> parent of 913949d... Solved issue with elasticity space boundary report
+ 
     }
 
     public synchronized void stopMonitoring() {
@@ -466,7 +453,7 @@ public class SystemControl {
             if (extractedData != null) {
                 //for each extracted snapshot, trim it to contain data only for the targetedMonitoredElement (minimizes RAM usage)
                 for (ServiceMonitoringSnapshot monitoringSnapshot : extractedData) {
-                    monitoringSnapshot.keepOnlyDataForElement(element);
+//                    monitoringSnapshot.keepOnlyDataForElement(element);
                     elasticitySpaceFunction.trainElasticitySpace(monitoringSnapshot);
                 }
             }
