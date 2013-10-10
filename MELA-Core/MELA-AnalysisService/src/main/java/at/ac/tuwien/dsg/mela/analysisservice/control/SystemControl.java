@@ -339,9 +339,7 @@ public class SystemControl {
     public synchronized ServiceMonitoringSnapshot getLatestMonitoringData() {
         return latestMonitoringData;
     }
-    private int monitoringCount = 1800;
-    private int currMonitoringIndex = 0;
-
+   
     private synchronized void startMonitoring() {
         monitoringTimer = new Timer();
 
@@ -350,19 +348,10 @@ public class SystemControl {
             public void run() {
                 if (serviceConfiguration != null) {
 
-                    monitoringCount--;
-                    if (monitoringCount <= 0) {
-                        this.cancel();
-                    }
-
+                 
                     ServiceMonitoringSnapshot monitoringData = getRawMonitoringData();
 
-                    currMonitoringIndex++;
-                    while (currMonitoringIndex < 0) {
-                        getRawMonitoringData();
-                        currMonitoringIndex++;
-                    }
-
+                 
                     if (monitoringData != null) {
                         historicalMonitoringData.add(monitoringData);
                         //remove the oldest and add the new value always
