@@ -15,7 +15,31 @@
     <name>MELA-AnalysisService</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+	<jettyVersion>7.2.1.v20101111</jettyVersion>
+    </properties>
+
     <dependencies>
+
+	<!-- Jetty: Those are to run the application inside an embedded jetty  -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jettyVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jettyVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>${jettyVersion}</version>
+		</dependency>
+
+	<!-- -->
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -180,6 +204,100 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+
+	<!-- mvn jetty:run will Run a Jetty server and automatically deploy the app. This is more for testing than production -->
+		<plugin>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-maven-plugin</artifactId>
+			<version>${jettyVersion}</version>
+		</plugin>
+
+	<!-- Package the application inside an executable war file to be run like java -jar <your-app>.war -->
+	<!-- Enable: java -jar loadbalancer.war, which exploits an embedded jetty, 
+				by copy Main.java into the war root and define the right entry in the MANIFEST 
+				to start the server, and copy all the jetty deps, again, in the root package 
+				to enable it to run -->
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>move-main-class</id>
+						<phase>package</phase>
+						<inherited>false</inherited>
+						<configuration>
+							<tasks>
+								<copy todir="${project.build.directory}/${project.build.finalName}">
+									<fileset
+										dir="${project.build.directory}/${project.build.finalName}/WEB-INF/classes/">
+										<include name="*.class" />
+									</fileset>
+								</copy>
+								<unjar dest="${project.build.directory}/${project.build.finalName}">
+									<fileset
+										dir="${project.build.directory}/${project.build.finalName}/WEB-INF/lib/">
+										<include name="jetty*" />
+										<include name="servlet-api*" />
+										<!-- Add here any other startup dependency -->
+									</fileset>
+									<patternset>
+										<exclude name="META-INF/**/*" />
+										<exclude name="images/**/*" />
+										<exclude name=".options" />
+										<exclude name="about.html" />
+										<exclude name="jdtCompilerAdapter.jar" />
+										<exclude name="plugin*" />
+									</patternset>
+								</unjar>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- We need to copy all the required classes in the right place at the right time. So we Force the ant plugin right in the middle of the war building process -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+
+				<configuration>
+					<archive>
+						<manifest>
+							<!-- By default a class called Main at the root of the project -->
+							<mainClass>Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+
+
+				<executions>
+					<execution>
+						<!-- First step is to disable the default-war build step. -->
+						<id>default-war</id>
+						<phase>none</phase>
+					</execution>
+					<execution>
+						<!-- Second step is to create an exploded war. Done in prepare-package -->
+						<id>war-exploded</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+					</execution>
+					<execution>
+						<!-- Last step is to make sure that the war is built in the package 
+							phase -->
+						<id>custom-war</id>
+						<phase>package</phase>
+						<goals>
+							<goal>war</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
 </project>
