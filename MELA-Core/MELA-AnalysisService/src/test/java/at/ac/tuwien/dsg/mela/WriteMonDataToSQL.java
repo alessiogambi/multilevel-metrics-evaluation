@@ -16,7 +16,7 @@
  * the License.
  */
 
-package test;
+package at.ac.tuwien.dsg.mela;
 
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.jaxbEntities.ClusterInfo;
 import at.ac.tuwien.dsg.mela.dataservice.MonDataSQLWriteAccess;

@@ -36,9 +36,9 @@
         <div id="chart"></div>
         <script type="text/javascript">
             
-            //change these to reflect the MELA RESTfull API location
-           //var deploymentIP = "http://localhost:8080";
-            var deploymentIP = "http://83.212.117.112";
+            var deploymentIP = "http://@IP:@PORT";
+            
+            
             var dataSource = deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/monitoringdataJSON");
             var metricsSource = deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/REST_WS/metriccompositionrules");
             var elSpaceHTMLURL = deploymentIP.concat("/MELA-AnalysisService-0.1-SNAPSHOT/mela_vis/elasticitySpaceAndPathway.html?");

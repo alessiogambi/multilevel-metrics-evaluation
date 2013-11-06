@@ -17,223 +17,239 @@
  */
 package at.ac.tuwien.dsg.mela.common.monitoringConcepts;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
+import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at
  **/
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "MonitoredElement")
-public class MonitoredElement implements Iterable<MonitoredElement>, Serializable {
+public class MonitoredElement implements Iterable<MonitoredElement>,
+		Serializable {
 
-    @XmlAttribute(name = "id", required = true)
-    private String id;
-//    @XmlAttribute(name = "ip", required = false)
-//    private String ip;
-    @XmlAttribute(name = "name", required = true)
-    private String name;
-    @XmlAttribute(name = "level", required = true)
-    private MonitoredElementLevel level;
-    @XmlElement(name = "MonitoredElement", required = false)
-    private Collection<MonitoredElement> containedElements;
+	@XmlAttribute(name = "id", required = true)
+	private String id;
+	// @XmlAttribute(name = "ip", required = false)
+	// private String ip;
+	@XmlAttribute(name = "name", required = true)
+	private String name;
+	@XmlAttribute(name = "level", required = true)
+	private MonitoredElementLevel level;
+	@XmlElement(name = "MonitoredElement", required = false)
+	private Collection<MonitoredElement> containedElements;
 
-    public MonitoredElement() {
-        containedElements = new ArrayList<MonitoredElement>();
-    }
+	public static final MonitoredElement loadFromFile(String file)
+			throws JAXBException, IOException {
+		JAXBContext contextObj = JAXBContext
+				.newInstance(MonitoredElement.class);
+		Unmarshaller unMarshallerObj = contextObj.createUnmarshaller();
+		MonitoredElement testResultsCollector = (MonitoredElement) unMarshallerObj
+				.unmarshal(new BufferedReader(new FileReader(file)));
+		return testResultsCollector;
+	}
 
-    public MonitoredElement(String id) {
-        containedElements = new ArrayList<MonitoredElement>();
-        this.id = id;
-    }
+	public MonitoredElement() {
+		containedElements = new ArrayList<MonitoredElement>();
+	}
 
-    public String getName() {
-        return name;
-    }
+	public MonitoredElement(String id) {
+		containedElements = new ArrayList<MonitoredElement>();
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void addElement(MonitoredElement MonitoredElement) {
-        containedElements.add(MonitoredElement);
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void removeElement(MonitoredElement MonitoredElement) {
-        containedElements.remove(MonitoredElement);
-    }
+	public void addElement(MonitoredElement MonitoredElement) {
+		containedElements.add(MonitoredElement);
+	}
 
-//    public String getIp() {
-//        return ip;
-//    }
-//
-//    public void setIp(String ip) {
-//        this.ip = ip;
-//    }
-    public MonitoredElementLevel getLevel() {
-        return level;
-    }
+	public void removeElement(MonitoredElement MonitoredElement) {
+		containedElements.remove(MonitoredElement);
+	}
 
-    public void setLevel(MonitoredElementLevel level) {
-        this.level = level;
-    }
+	// public String getIp() {
+	// return ip;
+	// }
+	//
+	// public void setIp(String ip) {
+	// this.ip = ip;
+	// }
+	public MonitoredElementLevel getLevel() {
+		return level;
+	}
 
-    public Collection<MonitoredElement> getContainedElements() {
-        return containedElements;
-    }
+	public void setLevel(MonitoredElementLevel level) {
+		this.level = level;
+	}
 
-    public void setContainedElements(Collection<MonitoredElement> containedElements) {
-        this.containedElements = containedElements;
-    }
+	public Collection<MonitoredElement> getContainedElements() {
+		return containedElements;
+	}
 
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlRootElement(name = "MonitoredElementLevel")
-    @XmlEnum
-    public enum MonitoredElementLevel implements Serializable{
-        @XmlEnumValue("SERVICE")
-        SERVICE,
-        @XmlEnumValue("SERVICE_TOPOLOGY")
-        SERVICE_TOPOLOGY,
-        @XmlEnumValue("SERVICE_UNIT")
-        SERVICE_UNIT,
-        @XmlEnumValue("VM")
-        VM,
-        @XmlEnumValue("VIRTUAL_CLUSTER")
-        VIRTUAL_CLUSTER
-    }
+	public void setContainedElements(
+			Collection<MonitoredElement> containedElements) {
+		this.containedElements = containedElements;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	@XmlAccessorType(XmlAccessType.FIELD)
+	@XmlRootElement(name = "MonitoredElementLevel")
+	@XmlEnum
+	public enum MonitoredElementLevel implements Serializable {
+		@XmlEnumValue("SERVICE")
+		SERVICE, @XmlEnumValue("SERVICE_TOPOLOGY")
+		SERVICE_TOPOLOGY, @XmlEnumValue("SERVICE_UNIT")
+		SERVICE_UNIT, @XmlEnumValue("VM")
+		VM, @XmlEnumValue("VIRTUAL_CLUSTER")
+		VIRTUAL_CLUSTER
+	}
 
-        MonitoredElement that = (MonitoredElement) o;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-        if (id != null ? !id.equals(that.id) : that.id != null) {
-            return false;
-        }
-//        if (ip != null ? !ip.equals(that.ip) : that.ip != null) return false;
-//        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+		MonitoredElement that = (MonitoredElement) o;
 
-        return true;
-    }
+		if (id != null ? !id.equals(that.id) : that.id != null) {
+			return false;
+		}
+		// if (ip != null ? !ip.equals(that.ip) : that.ip != null) return false;
+		// if (name != null ? !name.equals(that.name) : that.name != null)
+		// return false;
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-//        result = 31 * result + (ip != null ? ip.hashCode() : 0);
-//        result = 31 * result + (name != null ? name.hashCode() : 0);
-        return result;
-    }
+		return true;
+	}
 
-    /**
-     * @return BREADTH_FIRST iterator
-     */
-    @Override
-    public Iterator<MonitoredElement> iterator() {
-        return new ApplicationComponentIterator(this);
-    }
+	@Override
+	public int hashCode() {
+		int result = id != null ? id.hashCode() : 0;
+		// result = 31 * result + (ip != null ? ip.hashCode() : 0);
+		// result = 31 * result + (name != null ? name.hashCode() : 0);
+		return result;
+	}
 
-    //traverses the monitored data tree in a breadth-first manner
-    public class ApplicationComponentIterator implements Iterator<MonitoredElement> {
+	/**
+	 * @return BREADTH_FIRST iterator
+	 */
+	public Iterator<MonitoredElement> iterator() {
+		return new ApplicationComponentIterator(this);
+	}
 
-        //        private ApplicationNodeMonitoredData root;
-        private List<MonitoredElement> elements;
-        private Iterator<MonitoredElement> elementsIterator;
+	// traverses the monitored data tree in a breadth-first manner
+	public class ApplicationComponentIterator implements
+			Iterator<MonitoredElement> {
 
-        {
-            elements = new ArrayList<MonitoredElement>();
-        }
+		// private ApplicationNodeMonitoredData root;
+		private List<MonitoredElement> elements;
+		private Iterator<MonitoredElement> elementsIterator;
 
-        private ApplicationComponentIterator(MonitoredElement root) {
-//            this.root = root;
+		{
+			elements = new ArrayList<MonitoredElement>();
+		}
 
-            //breadth-first tree traversal to create hierarchical tree structure
-            List<MonitoredElement> applicationNodeMonitoredDataList = new ArrayList<MonitoredElement>();
+		private ApplicationComponentIterator(MonitoredElement root) {
+			// this.root = root;
 
-            applicationNodeMonitoredDataList.add(root);
-            elements.add(root);
+			// breadth-first tree traversal to create hierarchical tree
+			// structure
+			List<MonitoredElement> applicationNodeMonitoredDataList = new ArrayList<MonitoredElement>();
 
-            while (!applicationNodeMonitoredDataList.isEmpty()) {
-                MonitoredElement data = applicationNodeMonitoredDataList.remove(0);
+			applicationNodeMonitoredDataList.add(root);
+			elements.add(root);
 
-                for (MonitoredElement subData : data.getContainedElements()) {
-                    applicationNodeMonitoredDataList.add(subData);
-                    elements.add(subData);
-                }
-            }
-            elementsIterator = elements.iterator();
+			while (!applicationNodeMonitoredDataList.isEmpty()) {
+				MonitoredElement data = applicationNodeMonitoredDataList
+						.remove(0);
 
-        }
+				for (MonitoredElement subData : data.getContainedElements()) {
+					applicationNodeMonitoredDataList.add(subData);
+					elements.add(subData);
+				}
+			}
+			elementsIterator = elements.iterator();
 
-        @Override
-        public boolean hasNext() {
-            return elementsIterator.hasNext();
-        }
+		}
 
-        @Override
-        public MonitoredElement next() {
-            return elementsIterator.next();
-        }
+		public boolean hasNext() {
+			return elementsIterator.hasNext();
+		}
 
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Unsupported yet");
-        }
-    }
+		public MonitoredElement next() {
+			return elementsIterator.next();
+		}
 
-    /**
-     *
-     * @return a deep clone of all the serviceStructure element, EXCEPT VM
-     * LEVEL, as VM level is considered volatile and updated by the monitoring
-     * system.
-     */
-    public MonitoredElement clone() {
-        MonitoredElement newMonitoredElement = new MonitoredElement();
-        newMonitoredElement.level = level;
-        newMonitoredElement.id = id;
-        newMonitoredElement.name = name;
+		public void remove() {
+			throw new UnsupportedOperationException("Unsupported yet");
+		}
+	}
 
-        Collection<MonitoredElement> elements = new ArrayList<MonitoredElement>();
+	/**
+	 * 
+	 * @return a deep clone of all the serviceStructure element, EXCEPT VM
+	 *         LEVEL, as VM level is considered volatile and updated by the
+	 *         monitoring system.
+	 */
+	public MonitoredElement clone() {
+		MonitoredElement newMonitoredElement = new MonitoredElement();
+		newMonitoredElement.level = level;
+		newMonitoredElement.id = id;
+		newMonitoredElement.name = name;
 
-        //do not clone VM level. That is retrieved and updated from monitoring system
-        for (MonitoredElement el : containedElements) {
-//            if (el.getLevel() != MonitoredElementLevel.VM) {
-                elements.add(el.clone());
-//            }
-        }
-        newMonitoredElement.containedElements = elements;
-        return newMonitoredElement;
+		Collection<MonitoredElement> elements = new ArrayList<MonitoredElement>();
 
-    }
+		// do not clone VM level. That is retrieved and updated from monitoring
+		// system
+		for (MonitoredElement el : containedElements) {
+			// if (el.getLevel() != MonitoredElementLevel.VM) {
+			elements.add(el.clone());
+			// }
+		}
+		newMonitoredElement.containedElements = elements;
+		return newMonitoredElement;
 
-    @Override
-    public String toString() {
-        return "MonitoredElement{"
-                + ", id='" + id + '\''
-                + ", level=" + level
-                + ", name='" + name + '\''
-                + "containedElements=" + containedElements
-                + '}';
-    }
-    
-     
+	}
+
+	@Override
+	public String toString() {
+		return "MonitoredElement{" + ", id='" + id + '\'' + ", level=" + level
+				+ ", name='" + name + '\'' + "containedElements="
+				+ containedElements + '}';
+	}
+
 }

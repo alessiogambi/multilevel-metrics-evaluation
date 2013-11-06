@@ -33,91 +33,105 @@ import org.apache.log4j.Level;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * Author: Daniel Moldovan 
- * E-Mail: d.moldovan@dsg.tuwien.ac.at
+ * Author: Daniel Moldovan E-Mail: d.moldovan@dsg.tuwien.ac.at
  */
 public class LocalGangliaLiveDataSource implements DataSourceI {
 
-    private Yaml yaml = new Yaml();
-    private MonDataSQLWriteAccess dataSQLWriteAccess;
+	private Yaml yaml = new Yaml();
 
-    {
-        dataSQLWriteAccess = new MonDataSQLWriteAccess("mela", "mela");
-    }
+	// private MonDataSQLWriteAccess dataSQLWriteAccess;
 
-    public ClusterInfo getMonitoringData() throws DataAccessException {
+	// {
+	// dataSQLWriteAccess = new MonDataSQLWriteAccess("mela", "mela");
+	// }
 
-        String cmd = "telnet " + Configuration.getAccessMachineIP() + " " + Configuration.getGangliaPort();
-        String content = "";
+	public ClusterInfo getMonitoringData() throws DataAccessException {
 
-        try {
-            Process p = Runtime.getRuntime().exec(cmd);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = null;
+		String cmd = "telnet " + Configuration.getAccessMachineIP() + " "
+				+ Configuration.getGangliaPort();
+		String content = "";
 
-            while ((line = reader.readLine()) != null) {
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			String line = null;
 
-                //if ganglia does not respond
-                if (line.contains("Unable to connect")) {
-                    Configuration.getLogger(this.getClass()).log(Level.WARN, "Unable to execute " + cmd);
-                    return null;
-                }
-                if (line.contains("<") || line.endsWith("]>")) {
-                    content += line + "\n";
-                }
-            }
+			while ((line = reader.readLine()) != null) {
 
-            p.getInputStream().close();
-            p.getErrorStream().close();
-            p.getOutputStream().close();
-            p.destroy();
+				// if ganglia does not respond
+				if (line.contains("Unable to connect")) {
+					Configuration.getLogger(this.getClass()).log(Level.WARN,
+							"Unable to execute " + cmd);
+					return null;
+				}
+				if (line.contains("<") || line.endsWith("]>")) {
+					content += line + "\n";
+				}
+			}
 
-            //if ganglia does not respond
-            if (content == null || content.length() == 0) {
-                Configuration.getLogger(this.getClass()).log(Level.WARN, "" + "Unable to execute " + cmd);
-                return new ClusterInfo();
-            }
-        } catch (Exception ex) {
-            Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
-            return new ClusterInfo();
-        }
+			p.getInputStream().close();
+			p.getErrorStream().close();
+			p.getOutputStream().close();
+			p.destroy();
 
-        StringReader stringReader = new StringReader(content);
-        try {
-            JAXBContext jc = JAXBContext.newInstance(MonitoringSystemInfo.class);
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            MonitoringSystemInfo info = (MonitoringSystemInfo) unmarshaller.unmarshal(stringReader);
-            ClusterInfo gangliaClusterInfo = info.getClusters().iterator().next();
-            stringReader.close();
+			// if ganglia does not respond
+			if (content == null || content.length() == 0) {
+				Configuration.getLogger(this.getClass()).log(Level.WARN,
+						"" + "Unable to execute " + cmd);
+				return new ClusterInfo();
+			}
+		} catch (Exception ex) {
+			Configuration.getLogger(this.getClass()).log(Level.ERROR, ex);
+			return new ClusterInfo();
+		}
 
-            dataSQLWriteAccess.writeMonitoringData(gangliaClusterInfo);
+		StringReader stringReader = new StringReader(content);
+		try {
+			JAXBContext jc = JAXBContext
+					.newInstance(MonitoringSystemInfo.class);
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			MonitoringSystemInfo info = (MonitoringSystemInfo) unmarshaller
+					.unmarshal(stringReader);
+			ClusterInfo gangliaClusterInfo = info.getClusters().iterator()
+					.next();
+			stringReader.close();
 
-            return gangliaClusterInfo;
-        } catch (Exception e) {
-            Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage());
-            return new ClusterInfo();
-        }
-    }
+			// dataSQLWriteAccess.writeMonitoringData(gangliaClusterInfo);
 
-//    private void saveRawDataToFile(String file, GangliaClusterInfo gangliaClusterInfo) {
-////        Configuration.getLogger(this.getClass()).log(Level.INFO,"Collected monitoring data at " + new Date());
-//        try {
-//            String elasticity = yaml.dump(gangliaClusterInfo);
-//            //better to open close buffers as there are less chances I get the file in unstable state if I terminate the
-//            //program execution abruptly
-//            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-//            bufferedWriter.newLine();
-//            bufferedWriter.write("--- " + elasticity);
-//            bufferedWriter.flush();
-//            bufferedWriter.close();
-//        } catch (Exception e) {
-//            Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage(), e);
-//            e.printStackTrace();
-//        }
-//    }
-    @Override
-    protected void finalize() throws Throwable {
-        dataSQLWriteAccess.closeConnection();
-        super.finalize();
-    }
+			return gangliaClusterInfo;
+		} catch (Exception e) {
+			Configuration.getLogger(this.getClass()).log(Level.WARN,
+					e.getMessage());
+			return new ClusterInfo();
+		}
+	}
+
+	// private void saveRawDataToFile(String file, GangliaClusterInfo
+	// gangliaClusterInfo) {
+	// //
+	// Configuration.getLogger(this.getClass()).log(Level.INFO,"Collected monitoring data at "
+	// + new Date());
+	// try {
+	// String elasticity = yaml.dump(gangliaClusterInfo);
+	// //better to open close buffers as there are less chances I get the file
+	// in unstable state if I terminate the
+	// //program execution abruptly
+	// BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file,
+	// true));
+	// bufferedWriter.newLine();
+	// bufferedWriter.write("--- " + elasticity);
+	// bufferedWriter.flush();
+	// bufferedWriter.close();
+	// } catch (Exception e) {
+	// Configuration.getLogger(this.getClass()).log(Level.WARN, e.getMessage(),
+	// e);
+	// e.printStackTrace();
+	// }
+	// }
+	@Override
+	protected void finalize() throws Throwable {
+		// dataSQLWriteAccess.closeConnection();
+		super.finalize();
+	}
 }

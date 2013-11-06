@@ -7,12 +7,13 @@
   <version>0.1-SNAPSHOT</version>
   <name>MELA</name>
 
+<!--
   <parent>
     <groupId>eu.celar</groupId>
     <artifactId>distribution</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-
+-->
   <url>https://github.com/CELAR/multilevel-metrics-evaluation</url>
 
   <description>
